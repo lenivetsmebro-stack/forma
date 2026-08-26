@@ -9,6 +9,7 @@ import type {
 type MaterialsStepProps = {
   rooms: PlannerRoom[];
   onBack: () => void;
+  onRoomChange: (roomId: string, update: Partial<PlannerRoom>) => void;
   onAddOpening: (roomId: string, kind: PlannerOpeningKind) => void;
   onRemoveOpening: (
     roomId: string,
@@ -26,6 +27,7 @@ type MaterialsStepProps = {
 export function MaterialsStep({
   rooms,
   onBack,
+  onRoomChange,
   onAddOpening,
   onRemoveOpening,
   onUpdateOpening,
@@ -50,6 +52,7 @@ export function MaterialsStep({
               key={room.id}
               room={room}
               index={index}
+              onRoomChange={(update) => onRoomChange(room.id, update)}
               onAddOpening={(kind) => onAddOpening(room.id, kind)}
               onRemoveOpening={(kind, openingId) =>
                 onRemoveOpening(room.id, kind, openingId)
@@ -63,7 +66,7 @@ export function MaterialsStep({
             <button className="button button--secondary" type="button" onClick={onBack}>
               Назад к помещениям
             </button>
-            <p>Каталог материалов будет добавлен на следующем этапе.</p>
+            <p>Выбранные материалы и расчёты хранятся в текущей сессии Planner.</p>
           </div>
         </div>
         <MaterialsSummary rooms={rooms} />

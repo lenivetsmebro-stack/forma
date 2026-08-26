@@ -28,6 +28,29 @@ export interface PlannerOpening {
 
 export type PlannerOpeningKind = "doors" | "windows";
 
+export type MaterialSurface = "floor" | "walls" | "ceiling";
+export type MaterialUnit = "m2" | "package" | "liter" | "roll" | "kilogram" | "piece";
+export type WastePercent = 0 | 5 | 10 | 15;
+
+export interface PlannerMaterialSelection {
+  materialId: string;
+  wastePercent: WastePercent;
+}
+
+export type PlannerRoomFinishes = Record<
+  MaterialSurface,
+  PlannerMaterialSelection
+>;
+
+export interface PlannerMaterialDefinition {
+  id: string;
+  surface: MaterialSurface;
+  label: string;
+  calculationUnit: MaterialUnit;
+  coveragePerPackage?: number;
+  isNone?: boolean;
+}
+
 export interface PlannerRoom {
   id: string;
   type: RoomType | "";
@@ -37,4 +60,5 @@ export interface PlannerRoom {
   height: string;
   doors: PlannerOpening[];
   windows: PlannerOpening[];
+  finishes: PlannerRoomFinishes;
 }

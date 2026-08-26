@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 
 import { ObjectStep } from "@/components/planner/object-step";
 import { MaterialsStep } from "@/components/planner/materials-step";
+import { createDefaultRoomFinishes } from "@/components/planner/material-utils";
 import { PlannerProgress } from "@/components/planner/planner-progress";
 import { RoomsStep } from "@/components/planner/rooms-step";
 import type {
@@ -42,6 +43,7 @@ export function PlannerShell() {
       height: data.ceilingHeight?.toString() ?? "",
       doors: [],
       windows: [],
+      finishes: createDefaultRoomFinishes(),
     };
     nextRoomId.current += 1;
     return room;
@@ -155,6 +157,7 @@ export function PlannerShell() {
         <MaterialsStep
           rooms={rooms}
           onBack={() => setCurrentStep(2)}
+          onRoomChange={updateRoom}
           onAddOpening={addOpening}
           onUpdateOpening={updateOpening}
           onRemoveOpening={removeOpening}

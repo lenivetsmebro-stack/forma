@@ -1,4 +1,5 @@
 import { OpeningsEditor } from "@/components/planner/openings-editor";
+import { MaterialFinishSelector } from "@/components/planner/material-finish-selector";
 import type {
   PlannerOpening,
   PlannerOpeningKind,
@@ -20,6 +21,7 @@ import {
 type MaterialsRoomProps = {
   room: PlannerRoom;
   index: number;
+  onRoomChange: (update: Partial<PlannerRoom>) => void;
   onAddOpening: (kind: PlannerOpeningKind) => void;
   onRemoveOpening: (kind: PlannerOpeningKind, openingId: string) => void;
   onUpdateOpening: (
@@ -32,6 +34,7 @@ type MaterialsRoomProps = {
 export function MaterialsRoom({
   room,
   index,
+  onRoomChange,
   onAddOpening,
   onRemoveOpening,
   onUpdateOpening,
@@ -85,6 +88,36 @@ export function MaterialsRoom({
         <strong>{formatArea(calculateNetWallArea(room))} м²</strong>
         <small>Проёмы: {formatArea(openingsArea)} м²</small>
       </div>
+
+      <section className="materials-room__finishes" aria-labelledby={`${room.id}-finishes-title`}>
+        <div className="materials-room__finishes-heading">
+          <p className="section-label">Отделка</p>
+          <h4 id={`${room.id}-finishes-title`}>Материалы поверхностей</h4>
+        </div>
+        <div className="materials-room__finishes-list">
+          {(["floor", "walls", "ceiling"] as const).map((surface) => (
+            <MaterialFinishSelector
+              key={surface}
+              roomId={room.id}
+              roomName={roomName}
+              surface={surface}
+              surfaceArea={
+                surface === "floor"
+                  ? calculateRoomFloorArea(room)
+                  : surface === "ceiling"
+                    ? calculateRoomCeilingArea(room)
+                    : calculateNetWallArea(room)
+              }
+              selection={room.finishes[surface]}
+              onChange={(selection) =>
+                onRoomChange({
+                  finishes: { ...room.finishes, [surface]: selection },
+                })
+              }
+            />
+          ))}
+        </div>
+      </section>
     </article>
   );
 }
