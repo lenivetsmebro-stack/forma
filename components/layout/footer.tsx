@@ -4,7 +4,7 @@ import { Logo } from "@/components/ui/logo";
 
 export function Footer() {
   return (
-    <footer className="site-footer" id="contacts">
+    <footer className="site-footer">
       <Container className="site-footer__main">
         <div className="site-footer__intro">
           <Logo />

@@ -1,8 +1,11 @@
+import Link from "next/link";
+
 const navigationItems = [
-  { href: "#services", label: "Услуги" },
-  { href: "#projects", label: "Проекты" },
-  { href: "#studio", label: "О студии" },
-  { href: "#contacts", label: "Контакты" },
+  { href: "/#services", label: "Услуги" },
+  { href: "/#planner", label: "Planner" },
+  { href: "/#projects", label: "Проекты" },
+  { href: "/#studio", label: "О студии" },
+  { href: "/#contacts", label: "Контакты" },
 ];
 
 type NavigationProps = { className?: string; label?: string };
@@ -19,9 +22,9 @@ export function Navigation({
       <ul className="navigation__list">
         {navigationItems.map((item) => (
           <li key={item.href}>
-            <a className="navigation__link" href={item.href}>
+            <Link className="navigation__link" href={item.href}>
               {item.label}
-            </a>
+            </Link>
           </li>
         ))}
       </ul>
