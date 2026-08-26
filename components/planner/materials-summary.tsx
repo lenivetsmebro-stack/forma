@@ -1,6 +1,9 @@
 import type { PlannerRoom } from "@/components/planner/types";
-import { getMaterialById } from "@/components/planner/material-catalog";
-import { aggregateRoomMaterials } from "@/components/planner/material-utils";
+import {
+  aggregateRoomMaterials,
+  formatCurrency,
+  getMaterialScheduleSummary,
+} from "@/components/planner/material-utils";
 import {
   calculateTotalCeilingArea,
   calculateTotalDoorArea,
@@ -15,6 +18,7 @@ type MaterialsSummaryProps = { rooms: PlannerRoom[] };
 
 export function MaterialsSummary({ rooms }: MaterialsSummaryProps) {
   const materialTotals = aggregateRoomMaterials(rooms);
+  const materialSummary = getMaterialScheduleSummary(rooms, materialTotals);
   const values = [
     ["Пол", calculateTotalFloorArea(rooms)],
     ["Потолок", calculateTotalCeilingArea(rooms)],
@@ -37,34 +41,14 @@ export function MaterialsSummary({ rooms }: MaterialsSummaryProps) {
       <section className="materials-summary__materials" aria-labelledby="materials-totals-title">
         <p className="section-label">Материалы</p>
         <h3 id="materials-totals-title">По всему объекту</h3>
-        {materialTotals.length > 0 ? (
-          <ul>
-            {materialTotals.map((total) => {
-              const material = getMaterialById(total.materialId);
-              if (!material) return null;
-              return (
-                <li key={total.materialId}>
-                  <div>
-                    <strong>{material.label}</strong>
-                    <span>{total.roomCount} {total.roomCount === 1 ? "помещение" : "помещения"}</span>
-                  </div>
-                  <dl>
-                    <div><dt>Базовая площадь</dt><dd>{formatArea(total.baseArea)} м²</dd></div>
-                    <div><dt>С учётом запаса</dt><dd>{formatArea(total.requiredArea)} м²</dd></div>
-                    {total.packages !== null && total.purchasedArea !== null && (
-                      <>
-                        <div><dt>Необходимо</dt><dd>{total.packages} уп.</dd></div>
-                        <div><dt>Будет куплено</dt><dd>{formatArea(total.purchasedArea)} м²</dd></div>
-                      </>
-                    )}
-                  </dl>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
+        {materialTotals.length === 0 && (
           <p className="materials-summary__empty">Выберите отделку в помещениях — расчёт появится здесь автоматически.</p>
         )}
+        <dl className="materials-summary__material-counts">
+          <div><dt>Выбрано</dt><dd>{materialSummary.selectedCount}</dd></div>
+          <div><dt>К закупке</dt><dd>{materialSummary.purchasePositionCount} поз.</dd></div>
+          <div><dt>Предварительно</dt><dd>{formatCurrency(materialSummary.totalCost)}</dd></div>
+        </dl>
       </section>
       <p>
         Расчёты основаны на прямоугольной геометрии помещений. Позиции проёмов

@@ -30,6 +30,15 @@ export type PlannerOpeningKind = "doors" | "windows";
 
 export type MaterialSurface = "floor" | "walls" | "ceiling";
 export type MaterialUnit = "m2" | "package" | "liter" | "roll" | "kilogram" | "piece";
+export type MaterialPriceUnit =
+  | "package"
+  | "m2"
+  | "piece"
+  | "roll"
+  | "can"
+  | "bag"
+  | "linear-meter";
+export type MaterialPriceSource = "demo-local" | "external";
 export type WastePercent = 0 | 5 | 10 | 15;
 
 export interface PlannerMaterialSelection {
@@ -48,7 +57,18 @@ export interface PlannerMaterialDefinition {
   label: string;
   calculationUnit: MaterialUnit;
   coveragePerPackage?: number;
+  pricing?: PlannerMaterialPricing;
   isNone?: boolean;
+}
+
+export interface PlannerMaterialPricing {
+  price: number;
+  priceUnit: MaterialPriceUnit;
+  source: MaterialPriceSource;
+  storeName?: string;
+  productName?: string;
+  productUrl?: string;
+  updatedAt?: string;
 }
 
 export interface PlannerRoom {

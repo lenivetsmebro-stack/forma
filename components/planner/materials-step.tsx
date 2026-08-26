@@ -1,4 +1,5 @@
 import { MaterialsRoom } from "@/components/planner/materials-room";
+import { MaterialSchedule } from "@/components/planner/material-schedule";
 import { MaterialsSummary } from "@/components/planner/materials-summary";
 import type {
   PlannerOpening,
@@ -71,6 +72,7 @@ export function MaterialsStep({
         </div>
         <MaterialsSummary rooms={rooms} />
       </div>
+      <MaterialSchedule rooms={rooms} />
     </section>
   );
 }
