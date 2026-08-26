@@ -82,3 +82,37 @@ export interface PlannerRoom {
   windows: PlannerOpening[];
   finishes: PlannerRoomFinishes;
 }
+
+export type DesignMode = "global" | "per-room";
+
+export interface PlannerDesignData {
+  mode: DesignMode;
+  globalStyleId: string | null;
+  roomStyleSelections: Record<string, string>;
+}
+
+export interface InteriorStyleColor {
+  name: string;
+  hex: string;
+}
+
+export interface InteriorStyleDefinition {
+  id: string;
+  name: string;
+  shortDescription: string;
+  palette: InteriorStyleColor[];
+  materials: string[];
+  mood: string[];
+  keywords: string[];
+}
+
+export interface RoomDesignSpecification {
+  roomId: string;
+  roomName: string;
+  styleId: string;
+  styleName: string;
+  palette: InteriorStyleColor[];
+  materials: string[];
+  mood: string[];
+  keywords: string[];
+}

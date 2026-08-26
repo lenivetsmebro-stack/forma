@@ -7,11 +7,13 @@ import { MaterialsStep } from "@/components/planner/materials-step";
 import { createDefaultRoomFinishes } from "@/components/planner/material-utils";
 import { PlannerProgress } from "@/components/planner/planner-progress";
 import { RoomsStep } from "@/components/planner/rooms-step";
+import { StyleStep } from "@/components/planner/style-step";
 import type {
   PlannerObjectData,
   PlannerOpening,
   PlannerOpeningKind,
   PlannerRoom,
+  PlannerDesignData,
 } from "@/components/planner/types";
 
 const initialData: PlannerObjectData = {
@@ -22,10 +24,17 @@ const initialData: PlannerObjectData = {
   floorCount: null,
 };
 
+const initialDesignData: PlannerDesignData = {
+  mode: "global",
+  globalStyleId: null,
+  roomStyleSelections: {},
+};
+
 export function PlannerShell() {
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
   const [data, setData] = useState<PlannerObjectData>(initialData);
   const [rooms, setRooms] = useState<PlannerRoom[]>([]);
+  const [design, setDesign] = useState<PlannerDesignData>(initialDesignData);
   const nextRoomId = useRef(1);
   const nextOpeningId = useRef(1);
 
@@ -78,6 +87,10 @@ export function PlannerShell() {
     setRooms((current) =>
       current.map((room) => (room.id === roomId ? { ...room, ...update } : room)),
     );
+  }
+
+  function updateDesign(update: Partial<PlannerDesignData>) {
+    setDesign((current) => ({ ...current, ...update }));
   }
 
   function addOpening(roomId: string, kind: PlannerOpeningKind) {
@@ -153,14 +166,22 @@ export function PlannerShell() {
           onContinue={() => setCurrentStep(3)}
           onRoomChange={updateRoom}
         />
-      ) : (
+      ) : currentStep === 3 ? (
         <MaterialsStep
           rooms={rooms}
           onBack={() => setCurrentStep(2)}
+          onContinue={() => setCurrentStep(4)}
           onRoomChange={updateRoom}
           onAddOpening={addOpening}
           onUpdateOpening={updateOpening}
           onRemoveOpening={removeOpening}
+        />
+      ) : (
+        <StyleStep
+          rooms={rooms}
+          design={design}
+          onChange={updateDesign}
+          onBack={() => setCurrentStep(3)}
         />
       )}
     </section>

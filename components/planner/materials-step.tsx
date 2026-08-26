@@ -1,6 +1,7 @@
 import { MaterialsRoom } from "@/components/planner/materials-room";
 import { MaterialSchedule } from "@/components/planner/material-schedule";
 import { MaterialsSummary } from "@/components/planner/materials-summary";
+import { isMaterialsStepComplete } from "@/components/planner/material-utils";
 import type {
   PlannerOpening,
   PlannerOpeningKind,
@@ -10,6 +11,7 @@ import type {
 type MaterialsStepProps = {
   rooms: PlannerRoom[];
   onBack: () => void;
+  onContinue: () => void;
   onRoomChange: (roomId: string, update: Partial<PlannerRoom>) => void;
   onAddOpening: (roomId: string, kind: PlannerOpeningKind) => void;
   onRemoveOpening: (
@@ -28,11 +30,14 @@ type MaterialsStepProps = {
 export function MaterialsStep({
   rooms,
   onBack,
+  onContinue,
   onRoomChange,
   onAddOpening,
   onRemoveOpening,
   onUpdateOpening,
 }: MaterialsStepProps) {
+  const complete = isMaterialsStepComplete(rooms);
+
   return (
     <section className="materials-step" aria-labelledby="materials-step-title">
       <header className="materials-step__header">
@@ -63,16 +68,15 @@ export function MaterialsStep({
               }
             />
           ))}
-          <div className="materials-step__actions">
-            <button className="button button--secondary" type="button" onClick={onBack}>
-              Назад к помещениям
-            </button>
-            <p>Выбранные материалы и расчёты хранятся в текущей сессии Planner.</p>
-          </div>
         </div>
         <MaterialsSummary rooms={rooms} />
       </div>
       <MaterialSchedule rooms={rooms} />
+      <div className="materials-step__actions">
+        <button className="button button--secondary" type="button" onClick={onBack}>Назад к помещениям</button>
+        <button className="button button--primary" type="button" disabled={!complete} onClick={onContinue}>Продолжить к стилю</button>
+        <p className={complete ? "is-ready" : undefined}>{complete ? "Материалы и геометрия готовы" : "Выберите отделку для всех поверхностей и проверьте проёмы"}</p>
+      </div>
     </section>
   );
 }

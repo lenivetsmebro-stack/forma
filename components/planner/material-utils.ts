@@ -11,6 +11,8 @@ import {
   calculateRoomCeilingArea,
   calculateRoomFloorArea,
   getRoomName,
+  areRoomOpeningsValid,
+  isOpeningValid,
 } from "@/components/planner/planner-utils";
 
 export interface MaterialCalculation {
@@ -228,4 +230,14 @@ export function getMaterialScheduleSummary(
     costBySurface,
     totalCost: Object.values(costBySurface).reduce((total, cost) => total + cost, 0),
   };
+}
+
+export function isMaterialsStepComplete(rooms: PlannerRoom[]): boolean {
+  return rooms.length > 0 && rooms.every((room) => {
+    const finishesSelected = Object.values(room.finishes).every(
+      (selection) => getMaterialById(selection.materialId) !== undefined,
+    );
+    const openingsComplete = [...room.doors, ...room.windows].every(isOpeningValid);
+    return finishesSelected && openingsComplete && areRoomOpeningsValid(room);
+  });
 }
