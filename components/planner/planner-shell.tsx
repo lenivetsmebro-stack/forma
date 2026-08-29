@@ -8,6 +8,7 @@ import { createDefaultRoomFinishes } from "@/components/planner/material-utils";
 import { PlannerProgress } from "@/components/planner/planner-progress";
 import { RoomsStep } from "@/components/planner/rooms-step";
 import { StyleStep } from "@/components/planner/style-step";
+import { ThreeStep } from "@/components/planner/three-step";
 import type {
   PlannerObjectData,
   PlannerOpening,
@@ -31,7 +32,7 @@ const initialDesignData: PlannerDesignData = {
 };
 
 export function PlannerShell() {
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [data, setData] = useState<PlannerObjectData>(initialData);
   const [rooms, setRooms] = useState<PlannerRoom[]>([]);
   const [design, setDesign] = useState<PlannerDesignData>(initialDesignData);
@@ -176,13 +177,16 @@ export function PlannerShell() {
           onUpdateOpening={updateOpening}
           onRemoveOpening={removeOpening}
         />
-      ) : (
+      ) : currentStep === 4 ? (
         <StyleStep
           rooms={rooms}
           design={design}
           onChange={updateDesign}
           onBack={() => setCurrentStep(3)}
+          onContinue={() => setCurrentStep(5)}
         />
+      ) : (
+        <ThreeStep rooms={rooms} design={design} onBack={() => setCurrentStep(4)} />
       )}
     </section>
   );

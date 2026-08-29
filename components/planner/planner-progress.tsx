@@ -7,7 +7,7 @@ const plannerSteps = [
   { number: "06", label: "Расчёт" },
 ];
 
-type PlannerProgressProps = { currentStep: 1 | 2 | 3 | 4 };
+type PlannerProgressProps = { currentStep: 1 | 2 | 3 | 4 | 5 };
 
 export function PlannerProgress({ currentStep }: PlannerProgressProps) {
   return (
@@ -30,7 +30,7 @@ export function PlannerProgress({ currentStep }: PlannerProgressProps) {
           );
         })}
       </ol>
-      <p>Этапы 05 и 06 будут доступны позже</p>
+      <p>Этап 06 будет доступен позже</p>
     </nav>
   );
 }

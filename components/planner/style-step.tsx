@@ -14,9 +14,10 @@ type StyleStepProps = {
   design: PlannerDesignData;
   onChange: (update: Partial<PlannerDesignData>) => void;
   onBack: () => void;
+  onContinue: () => void;
 };
 
-export function StyleStep({ rooms, design, onChange, onBack }: StyleStepProps) {
+export function StyleStep({ rooms, design, onChange, onBack, onContinue }: StyleStepProps) {
   const [activeRoomId, setActiveRoomId] = useState(rooms[0]?.id ?? "");
   const activeRoom = rooms.find((room) => room.id === activeRoomId) ?? rooms[0];
   const selectedStyleId = design.mode === "global"
@@ -132,7 +133,7 @@ export function StyleStep({ rooms, design, onChange, onBack }: StyleStepProps) {
 
           <div className="style-step__actions">
             <button className="button button--secondary" type="button" onClick={onBack}>Назад к материалам</button>
-            <button className="button button--primary" type="button" disabled>Продолжить к 3D</button>
+            <button className="button button--primary" type="button" disabled={!complete} onClick={onContinue}>Продолжить к 3D</button>
             <p className={complete ? "is-ready" : undefined}>{complete ? "Дизайн-направление готово" : "Завершите выбор стиля"}</p>
             <small>Следующий этап — 3D-визуализация пространства.</small>
           </div>
