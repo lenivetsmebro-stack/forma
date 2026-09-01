@@ -2,10 +2,10 @@
 
 import { Component, type ErrorInfo, type ReactNode, useState } from "react";
 
-import type { Room3DModel } from "@/components/planner/room-3d-utils";
+import type { Room3DCameraPreset, Room3DModel } from "@/components/planner/room-3d-utils";
 import { Room3DScene } from "@/components/planner/room-3d-scene";
 
-type Room3DViewportProps = { model: Room3DModel };
+type Room3DViewportProps = { model: Room3DModel; preset: Room3DCameraPreset };
 type BoundaryProps = { children: ReactNode };
 type BoundaryState = { failed: boolean };
 
@@ -31,7 +31,7 @@ function ViewportFallback() {
   return <div className="room-3d-viewport__fallback" role="status">3D preview недоступен на этом устройстве.</div>;
 }
 
-export function Room3DViewport({ model }: Room3DViewportProps) {
+export function Room3DViewport({ model, preset }: Room3DViewportProps) {
   const [webglAvailable] = useState(() => {
     try {
       const canvas = document.createElement("canvas");
@@ -48,7 +48,7 @@ export function Room3DViewport({ model }: Room3DViewportProps) {
     <figure className="room-3d-viewport">
       <div className="room-3d-viewport__canvas">
         {webglAvailable ? (
-          <WebGLErrorBoundary><Room3DScene model={model} /></WebGLErrorBoundary>
+          <WebGLErrorBoundary><Room3DScene key={`${model.roomId}-${preset}`} model={model} preset={preset} /></WebGLErrorBoundary>
         ) : (
           <ViewportFallback />
         )}
