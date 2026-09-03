@@ -38,6 +38,7 @@ function createEmptyMarkup(fileSessionId: string): ImportedPlanMarkup {
     calibrationPoints: [],
     calibration: null,
     walls: [],
+    rooms: [],
   };
 }
 

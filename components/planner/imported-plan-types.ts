@@ -10,8 +10,10 @@ export type PlanScaleCalibration = {
   pointA: NormalizedPoint2D;
   pointB: NormalizedPoint2D;
   realLengthMeters: number;
-  imageDistance: number;
-  metersPerNormalizedUnit: number;
+  imageWidthPx: number;
+  imageHeightPx: number;
+  pixelDistance: number;
+  metersPerPixel: number;
 };
 
 export type ImportedWall = {
@@ -20,11 +22,18 @@ export type ImportedWall = {
   end: NormalizedPoint2D;
 };
 
+export type ImportedRoomPolygon = {
+  id: string;
+  name: string;
+  vertices: NormalizedPoint2D[];
+};
+
 export type ImportedPlanMarkup = {
   fileSessionId: string;
   calibrationPoints: NormalizedPoint2D[];
   calibration: PlanScaleCalibration | null;
   walls: ImportedWall[];
+  rooms: ImportedRoomPolygon[];
 };
 
 export type ImportedOpeningType = "door" | "window";

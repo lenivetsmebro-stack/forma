@@ -744,6 +744,7 @@ button { font: inherit; }
 
 .plan-markup__layout,
 .plan-markup__main { display: grid; gap: 2rem; min-width: 0; }
+.plan-markup__main { align-self: start; }
 
 .plan-markup__instructions {
   display: grid;
@@ -755,6 +756,27 @@ button { font: inherit; }
 
 .plan-markup__instructions p { margin: 0; }
 .plan-markup__instructions p:last-child { color: var(--muted); font-size: 0.8125rem; }
+
+.plan-markup__mode {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--line);
+}
+
+.plan-markup__mode button {
+  min-height: 3rem;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.plan-markup__mode button + button { border-left: 1px solid var(--line); }
+.plan-markup__mode button[aria-pressed="true"] { background: var(--foreground); color: var(--surface); }
 
 .plan-markup__workspace {
   position: relative;
@@ -794,6 +816,51 @@ button { font: inherit; }
   vector-effect: non-scaling-stroke;
 }
 
+.plan-markup__saved-room-fills polygon {
+  fill: color-mix(in srgb, var(--accent) 15%, transparent);
+  stroke: none;
+  pointer-events: none;
+}
+
+.plan-markup__saved-room-outlines polygon {
+  fill: none;
+  stroke: var(--accent-strong);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.plan-markup__saved-room-outlines text {
+  fill: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(11px, 1.7vw, 16px);
+  font-weight: 700;
+  paint-order: stroke;
+  pointer-events: none;
+  stroke: var(--surface);
+  stroke-linejoin: round;
+  stroke-width: 4.5px;
+  text-anchor: middle;
+  vector-effect: non-scaling-stroke;
+}
+
+.plan-markup__saved-room-outlines text tspan + tspan { font-size: 0.85em; font-weight: 400; }
+
+.plan-markup__room-draft polyline {
+  fill: none;
+  stroke: var(--foreground);
+  stroke-dasharray: 7 5;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.plan-markup__room-draft circle {
+  fill: var(--surface);
+  stroke: var(--foreground);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
 .plan-markup__calibration-line {
   stroke: var(--accent-strong);
   stroke-dasharray: 8 6;
@@ -808,7 +875,8 @@ button { font: inherit; }
 }
 
 .plan-markup__calibration-point text,
-.plan-markup__draft-point text {
+.plan-markup__draft-point text,
+.plan-markup__room-draft text {
   fill: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   font-size: clamp(12px, 2vw, 18px);
@@ -820,13 +888,17 @@ button { font: inherit; }
 }
 
 .plan-markup__calibration-controls,
-.plan-markup__wall-controls {
+.plan-markup__wall-controls,
+.plan-markup__room-controls {
   display: grid;
   gap: 0.75rem;
   min-width: 0;
 }
 
 .plan-markup__calibration-controls .field { padding-top: 0; }
+.plan-markup__wall-controls > p,
+.plan-markup__room-controls > p { margin: 0; color: var(--muted); font-size: 0.8125rem; }
+.plan-markup__message { min-height: 1.5rem; margin: -1rem 0 0; color: #73513f; font-size: 0.75rem; line-height: 1.5; }
 
 .plan-markup__reset-scale {
   min-height: 2.75rem;
@@ -877,8 +949,8 @@ button { font: inherit; }
 
 .plan-markup-summary__walls {
   display: grid;
-  max-height: 18rem;
-  overflow-y: auto;
+  max-height: none;
+  overflow: visible;
   margin: 1.5rem 0;
   padding: 0;
   border-top: 1px solid var(--line);
@@ -897,6 +969,32 @@ button { font: inherit; }
 
 .plan-markup-summary__walls span { min-width: 0; white-space: nowrap; }
 .plan-markup-summary__walls button { min-width: 4.5rem; min-height: 2.75rem; border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 0.6875rem; text-transform: uppercase; }
+
+.plan-markup-summary__section { margin-top: 1.75rem; }
+.plan-markup-summary__section h3 { margin: 0; color: var(--muted); font-size: 0.6875rem; letter-spacing: 0.1em; text-transform: uppercase; }
+
+.plan-markup-summary__rooms {
+  display: grid;
+  max-height: none;
+  overflow: visible;
+  margin: 1rem 0 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+  list-style: none;
+}
+
+.plan-markup-summary__rooms li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.3rem 0.75rem;
+  padding-block: 0.7rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.plan-markup-summary__rooms label { grid-column: 1 / -1; color: var(--muted); font-size: 0.6875rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.plan-markup-summary__rooms input { grid-column: 1 / -1; width: 100%; min-width: 0; min-height: 2.75rem; border: 1px solid var(--line); padding: 0.45rem 0.625rem; background: var(--surface); color: var(--foreground); font-family: Georgia, "Times New Roman", serif; font-size: 1rem; }
+.plan-markup-summary__rooms p { margin: 0; color: var(--muted); font-size: 0.75rem; line-height: 1.45; }
+.plan-markup-summary__rooms button { grid-column: 2; grid-row: 3 / span 2; min-width: 4.5rem; min-height: 2.75rem; border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 0.6875rem; text-transform: uppercase; }
 .plan-markup-summary > .button { width: 100%; margin-top: 1.5rem; }
 .plan-markup-summary__note { margin: 1rem 0 0; color: var(--muted); font-size: 0.75rem; line-height: 1.5; }
 
@@ -2542,6 +2640,9 @@ button { font: inherit; }
   .planner-entry-mode label + label { border-top: 0; border-left: 1px solid var(--line); }
   .plan-markup__calibration-controls { grid-template-columns: minmax(12rem, 1fr) minmax(12rem, auto) minmax(10rem, auto); align-items: end; }
   .plan-markup__wall-controls { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .plan-markup__wall-controls > p { grid-column: 1 / -1; }
+  .plan-markup__room-controls { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .plan-markup__room-controls > p { grid-column: 1 / -1; }
   .plan-markup__reset-scale { grid-column: 1 / -1; }
   .object-form__fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .field:nth-child(odd) { padding-right: 1rem; }
@@ -2625,7 +2726,20 @@ button { font: inherit; }
   .import-step__layout { grid-template-columns: minmax(0, 1.45fr) minmax(18rem, 0.55fr); align-items: start; gap: clamp(3rem, 5vw, 5rem); }
   .import-summary { position: sticky; top: 2rem; }
   .plan-markup__layout { grid-template-columns: minmax(0, 1.6fr) minmax(18rem, 0.4fr); align-items: start; gap: clamp(2rem, 4vw, 4rem); }
-  .plan-markup-summary { position: sticky; top: 2rem; }
+  .plan-markup-summary {
+    position: sticky;
+    top: 2rem;
+    max-height: calc(100svh - 4rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+  .plan-markup-summary__walls,
+  .plan-markup-summary__rooms { overflow-y: auto; overscroll-behavior: contain; }
+  .plan-markup-summary--walls-mode .plan-markup-summary__walls { max-height: 17rem; }
+  .plan-markup-summary--walls-mode .plan-markup-summary__rooms { max-height: 7rem; }
+  .plan-markup-summary--rooms-mode .plan-markup-summary__walls { max-height: 5.5rem; margin-bottom: 0.5rem; }
+  .plan-markup-summary--rooms-mode .plan-markup-summary__rooms { max-height: 22rem; }
   .rooms-step__layout {
     grid-template-columns: minmax(0, 1.45fr) minmax(18rem, 0.55fr);
     align-items: start;

@@ -1,4 +1,5 @@
 import type {
+  ImportedRoomPolygon,
   ImportedWall,
   NormalizedPoint2D,
   PlanScaleCalibration,
@@ -17,31 +18,32 @@ export type Size2D = {
   height: number;
 };
 
+const GEOMETRY_EPSILON = 1e-9;
+
 function isFinitePoint(point: Point2D) {
   return Number.isFinite(point.x) && Number.isFinite(point.y);
 }
 
-function isPositiveSize(size: Size2D) {
+function isNormalizedPoint(point: NormalizedPoint2D) {
   return (
-    Number.isFinite(size.width) &&
-    Number.isFinite(size.height) &&
-    size.width > 0 &&
-    size.height > 0
+    isFinitePoint(point) &&
+    point.x >= 0 && point.x <= 1 &&
+    point.y >= 0 && point.y <= 1
   );
 }
 
-export function getContainedImageRect(
-  container: Rect2D,
-  intrinsicSize: Size2D,
-): Rect2D | null {
+function isPositiveSize(size: Size2D) {
+  return (
+    Number.isFinite(size.width) && Number.isFinite(size.height) &&
+    size.width > 0 && size.height > 0
+  );
+}
+
+export function getContainedImageRect(container: Rect2D, intrinsicSize: Size2D): Rect2D | null {
   if (
-    !isPositiveSize(container) ||
-    !isPositiveSize(intrinsicSize) ||
-    !Number.isFinite(container.left) ||
-    !Number.isFinite(container.top)
-  ) {
-    return null;
-  }
+    !isPositiveSize(container) || !isPositiveSize(intrinsicSize) ||
+    !Number.isFinite(container.left) || !Number.isFinite(container.top)
+  ) return null;
 
   const scale = Math.min(
     container.width / intrinsicSize.width,
@@ -49,7 +51,6 @@ export function getContainedImageRect(
   );
   const width = intrinsicSize.width * scale;
   const height = intrinsicSize.height * scale;
-
   return {
     left: container.left + (container.width - width) / 2,
     top: container.top + (container.height - height) / 2,
@@ -58,84 +59,212 @@ export function getContainedImageRect(
   };
 }
 
-export function getNormalizedPoint(
-  pointer: Point2D,
-  imageRect: Rect2D,
-): NormalizedPoint2D | null {
+export function getNormalizedPoint(pointer: Point2D, imageRect: Rect2D): NormalizedPoint2D | null {
   if (!isFinitePoint(pointer) || !isPositiveSize(imageRect)) return null;
   const x = (pointer.x - imageRect.left) / imageRect.width;
   const y = (pointer.y - imageRect.top) / imageRect.height;
-
   if (x < 0 || x > 1 || y < 0 || y > 1) return null;
   return { x, y };
 }
 
-export function getNormalizedDistance(
-  pointA: NormalizedPoint2D,
-  pointB: NormalizedPoint2D,
-) {
+export function getNormalizedDistance(pointA: NormalizedPoint2D, pointB: NormalizedPoint2D) {
   if (!isFinitePoint(pointA) || !isFinitePoint(pointB)) return null;
   return Math.hypot(pointB.x - pointA.x, pointB.y - pointA.y);
+}
+
+export function getPixelDistance(
+  pointA: NormalizedPoint2D,
+  pointB: NormalizedPoint2D,
+  imageSize: Size2D,
+) {
+  if (!isFinitePoint(pointA) || !isFinitePoint(pointB) || !isPositiveSize(imageSize)) return null;
+  return Math.hypot(
+    (pointB.x - pointA.x) * imageSize.width,
+    (pointB.y - pointA.y) * imageSize.height,
+  );
 }
 
 export function createScaleCalibration(
   pointA: NormalizedPoint2D,
   pointB: NormalizedPoint2D,
   realLengthMeters: number,
+  imageSize: Size2D,
 ): PlanScaleCalibration | null {
-  const imageDistance = getNormalizedDistance(pointA, pointB);
+  const pixelDistance = getPixelDistance(pointA, pointB, imageSize);
   if (
-    imageDistance === null ||
-    imageDistance <= 0 ||
-    !Number.isFinite(realLengthMeters) ||
-    realLengthMeters <= 0
-  ) {
-    return null;
-  }
+    pixelDistance === null || pixelDistance <= GEOMETRY_EPSILON ||
+    !Number.isFinite(realLengthMeters) || realLengthMeters <= 0
+  ) return null;
 
-  const metersPerNormalizedUnit = realLengthMeters / imageDistance;
-  if (!Number.isFinite(metersPerNormalizedUnit)) return null;
-
+  const metersPerPixel = realLengthMeters / pixelDistance;
+  if (!Number.isFinite(metersPerPixel) || metersPerPixel <= 0) return null;
   return {
     pointA: { ...pointA },
     pointB: { ...pointB },
     realLengthMeters,
-    imageDistance,
-    metersPerNormalizedUnit,
+    imageWidthPx: imageSize.width,
+    imageHeightPx: imageSize.height,
+    pixelDistance,
+    metersPerPixel,
   };
 }
 
 export function getRealDistanceFromCalibration(
-  normalizedDistance: number,
+  pixelDistance: number,
   calibration: PlanScaleCalibration,
 ) {
   if (
-    !Number.isFinite(normalizedDistance) ||
-    normalizedDistance < 0 ||
-    !Number.isFinite(calibration.metersPerNormalizedUnit) ||
-    calibration.metersPerNormalizedUnit <= 0
-  ) {
-    return null;
+    !Number.isFinite(pixelDistance) || pixelDistance < 0 ||
+    !Number.isFinite(calibration.metersPerPixel) || calibration.metersPerPixel <= 0
+  ) return null;
+  return pixelDistance * calibration.metersPerPixel;
+}
+
+export function getWallLengthMeters(wall: ImportedWall, calibration: PlanScaleCalibration) {
+  const pixelDistance = getPixelDistance(wall.start, wall.end, {
+    width: calibration.imageWidthPx,
+    height: calibration.imageHeightPx,
+  });
+  return pixelDistance === null ? null : getRealDistanceFromCalibration(pixelDistance, calibration);
+}
+
+export function getTotalWallLengthMeters(walls: ImportedWall[], calibration: PlanScaleCalibration) {
+  return walls.reduce((total, wall) => total + (getWallLengthMeters(wall, calibration) ?? 0), 0);
+}
+
+export function getPolygonAreaNormalized(vertices: NormalizedPoint2D[]) {
+  if (vertices.length < 3 || vertices.some((point) => !isFinitePoint(point))) return null;
+  let twiceArea = 0;
+  for (let index = 0; index < vertices.length; index += 1) {
+    const current = vertices[index];
+    const next = vertices[(index + 1) % vertices.length];
+    if (!current || !next) return null;
+    twiceArea += current.x * next.y - next.x * current.y;
   }
-  return normalizedDistance * calibration.metersPerNormalizedUnit;
+  return Math.abs(twiceArea) / 2;
 }
 
-export function getWallLengthMeters(
-  wall: ImportedWall,
-  calibration: PlanScaleCalibration,
-) {
-  const normalizedDistance = getNormalizedDistance(wall.start, wall.end);
-  return normalizedDistance === null
-    ? null
-    : getRealDistanceFromCalibration(normalizedDistance, calibration);
+export function getPolygonAreaPixels(vertices: NormalizedPoint2D[], imageSize: Size2D) {
+  if (!isPositiveSize(imageSize)) return null;
+  const normalizedArea = getPolygonAreaNormalized(vertices);
+  return normalizedArea === null ? null : normalizedArea * imageSize.width * imageSize.height;
 }
 
-export function getTotalWallLengthMeters(
-  walls: ImportedWall[],
+export function getRoomAreaMeters2(room: ImportedRoomPolygon, calibration: PlanScaleCalibration) {
+  const pixelArea = getPolygonAreaPixels(room.vertices, {
+    width: calibration.imageWidthPx,
+    height: calibration.imageHeightPx,
+  });
+  if (pixelArea === null || !Number.isFinite(calibration.metersPerPixel)) return null;
+  const area = pixelArea * calibration.metersPerPixel ** 2;
+  return Number.isFinite(area) ? area : null;
+}
+
+export function getRoomPerimeterMeters(room: ImportedRoomPolygon, calibration: PlanScaleCalibration) {
+  if (room.vertices.length < 3) return null;
+  let perimeterPixels = 0;
+  const imageSize = { width: calibration.imageWidthPx, height: calibration.imageHeightPx };
+  for (let index = 0; index < room.vertices.length; index += 1) {
+    const current = room.vertices[index];
+    const next = room.vertices[(index + 1) % room.vertices.length];
+    if (!current || !next) return null;
+    const length = getPixelDistance(current, next, imageSize);
+    if (length === null) return null;
+    perimeterPixels += length;
+  }
+  return getRealDistanceFromCalibration(perimeterPixels, calibration);
+}
+
+function orientation(a: Point2D, b: Point2D, c: Point2D) {
+  return (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
+}
+
+function pointOnSegment(a: Point2D, b: Point2D, point: Point2D) {
+  return (
+    point.x <= Math.max(a.x, b.x) + GEOMETRY_EPSILON &&
+    point.x >= Math.min(a.x, b.x) - GEOMETRY_EPSILON &&
+    point.y <= Math.max(a.y, b.y) + GEOMETRY_EPSILON &&
+    point.y >= Math.min(a.y, b.y) - GEOMETRY_EPSILON
+  );
+}
+
+function segmentsIntersect(a: Point2D, b: Point2D, c: Point2D, d: Point2D) {
+  const first = orientation(a, b, c);
+  const second = orientation(a, b, d);
+  const third = orientation(c, d, a);
+  const fourth = orientation(c, d, b);
+  if ((first > 0) !== (second > 0) && (third > 0) !== (fourth > 0)) return true;
+  if (Math.abs(first) <= GEOMETRY_EPSILON && pointOnSegment(a, b, c)) return true;
+  if (Math.abs(second) <= GEOMETRY_EPSILON && pointOnSegment(a, b, d)) return true;
+  if (Math.abs(third) <= GEOMETRY_EPSILON && pointOnSegment(c, d, a)) return true;
+  if (Math.abs(fourth) <= GEOMETRY_EPSILON && pointOnSegment(c, d, b)) return true;
+  return false;
+}
+
+export function isSelfIntersectingPolygon(vertices: NormalizedPoint2D[]) {
+  if (vertices.length < 4) return false;
+  for (let firstIndex = 0; firstIndex < vertices.length; firstIndex += 1) {
+    const firstStart = vertices[firstIndex];
+    const firstEnd = vertices[(firstIndex + 1) % vertices.length];
+    if (!firstStart || !firstEnd) return true;
+    for (let secondIndex = firstIndex + 1; secondIndex < vertices.length; secondIndex += 1) {
+      const adjacent = secondIndex === firstIndex + 1 || (firstIndex === 0 && secondIndex === vertices.length - 1);
+      if (adjacent) continue;
+      const secondStart = vertices[secondIndex];
+      const secondEnd = vertices[(secondIndex + 1) % vertices.length];
+      if (!secondStart || !secondEnd) return true;
+      if (segmentsIntersect(firstStart, firstEnd, secondStart, secondEnd)) return true;
+    }
+  }
+  return false;
+}
+
+export function isValidRoomPolygon(vertices: NormalizedPoint2D[], calibration: PlanScaleCalibration) {
+  if (vertices.length < 3 || vertices.some((point) => !isNormalizedPoint(point))) return false;
+  if (isSelfIntersectingPolygon(vertices)) return false;
+  const pixelArea = getPolygonAreaPixels(vertices, {
+    width: calibration.imageWidthPx,
+    height: calibration.imageHeightPx,
+  });
+  return pixelArea !== null && pixelArea > 1;
+}
+
+export function arePointsNear(
+  pointA: NormalizedPoint2D,
+  pointB: NormalizedPoint2D,
+  imageSize: Size2D,
+  thresholdPixels = 4,
+) {
+  const distance = getPixelDistance(pointA, pointB, imageSize);
+  return distance !== null && distance <= thresholdPixels;
+}
+
+export function getPolygonCentroid(vertices: NormalizedPoint2D[]) {
+  if (vertices.length === 0 || vertices.some((point) => !isFinitePoint(point))) return null;
+  let signedTwiceArea = 0;
+  let x = 0;
+  let y = 0;
+  for (let index = 0; index < vertices.length; index += 1) {
+    const current = vertices[index];
+    const next = vertices[(index + 1) % vertices.length];
+    if (!current || !next) return null;
+    const cross = current.x * next.y - next.x * current.y;
+    signedTwiceArea += cross;
+    x += (current.x + next.x) * cross;
+    y += (current.y + next.y) * cross;
+  }
+  if (Math.abs(signedTwiceArea) <= GEOMETRY_EPSILON) {
+    return {
+      x: vertices.reduce((sum, point) => sum + point.x, 0) / vertices.length,
+      y: vertices.reduce((sum, point) => sum + point.y, 0) / vertices.length,
+    };
+  }
+  return { x: x / (3 * signedTwiceArea), y: y / (3 * signedTwiceArea) };
+}
+
+export function getTotalRoomAreaMeters2(
+  rooms: ImportedRoomPolygon[],
   calibration: PlanScaleCalibration,
 ) {
-  return walls.reduce((total, wall) => {
-    const length = getWallLengthMeters(wall, calibration);
-    return total + (length ?? 0);
-  }, 0);
+  return rooms.reduce((total, room) => total + (getRoomAreaMeters2(room, calibration) ?? 0), 0);
 }
