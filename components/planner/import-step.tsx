@@ -11,6 +11,7 @@ import {
 import type { ChangeEvent, DragEvent } from "react";
 
 import type { ImportedFloorPlan } from "@/components/planner/imported-plan-types";
+import type { ImportedPlanMarkup } from "@/components/planner/imported-plan-types";
 import {
   formatImportFileSize,
   getImportedPlanSourceType,
@@ -19,15 +20,26 @@ import {
   normalizeImportedFloorPlan,
   validateImportedFloorPlan,
 } from "@/components/planner/imported-plan-utils";
+import { PlanMarkupStep } from "@/components/planner/plan-markup-step";
 
 type ImportStepProps = {
   onCancel: () => void;
 };
 
 type ImportSessionFile = {
+  id: string;
   file: File;
   previewUrl: string | null;
 };
+
+function createEmptyMarkup(fileSessionId: string): ImportedPlanMarkup {
+  return {
+    fileSessionId,
+    calibrationPoints: [],
+    calibration: null,
+    walls: [],
+  };
+}
 
 function readPositiveNumber(value: string) {
   if (value.trim() === "") return undefined;
@@ -37,9 +49,14 @@ function readPositiveNumber(value: string) {
 
 export function ImportStep({ onCancel }: ImportStepProps) {
   const inputId = useId();
+  const replaceInputId = useId();
   const previewUrlRef = useRef<string | null>(null);
+  const nextFileSessionId = useRef(1);
   const [sessionFile, setSessionFile] = useState<ImportSessionFile | null>(null);
   const [plan, setPlan] = useState<ImportedFloorPlan | null>(null);
+  const [workflowScreen, setWorkflowScreen] = useState<"parameters" | "markup">("parameters");
+  const [markup, setMarkup] = useState<ImportedPlanMarkup | null>(null);
+  const [realLengthInput, setRealLengthInput] = useState("");
   const [scaleInput, setScaleInput] = useState("");
   const [ceilingInput, setCeilingInput] = useState("2.7");
   const [fileError, setFileError] = useState<string | null>(null);
@@ -64,6 +81,12 @@ export function ImportStep({ onCancel }: ImportStepProps) {
   const scaleInvalid = scaleInput !== "" && !scaleReady;
   const ceilingInvalid = ceilingInput !== "" && !ceilingReady;
   const readyForMarkup = Boolean(sessionFile && ceilingReady);
+  const canOpenMarkup = Boolean(
+    readyForMarkup &&
+      plan?.sourceType === "image" &&
+      sessionFile?.previewUrl &&
+      markup,
+  );
 
   function clearPreviewUrl() {
     if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
@@ -89,8 +112,13 @@ export function ImportStep({ onCancel }: ImportStepProps) {
 
     clearPreviewUrl();
     const previewUrl = sourceType === "image" ? URL.createObjectURL(file) : null;
+    const fileSessionId = `import-file-${nextFileSessionId.current}`;
+    nextFileSessionId.current += 1;
     previewUrlRef.current = previewUrl;
-    setSessionFile({ file, previewUrl });
+    setSessionFile({ id: fileSessionId, file, previewUrl });
+    setMarkup(createEmptyMarkup(fileSessionId));
+    setRealLengthInput("");
+    setWorkflowScreen("parameters");
     setPlan({
       sourceType,
       fileName: file.name,
@@ -136,7 +164,29 @@ export function ImportStep({ onCancel }: ImportStepProps) {
     clearPreviewUrl();
     setSessionFile(null);
     setPlan(null);
+    setMarkup(null);
+    setRealLengthInput("");
+    setWorkflowScreen("parameters");
     setFileError(null);
+  }
+
+  if (
+    workflowScreen === "markup" &&
+    sessionFile?.previewUrl &&
+    plan?.sourceType === "image" &&
+    markup?.fileSessionId === sessionFile.id
+  ) {
+    return (
+      <PlanMarkupStep
+        fileName={sessionFile.file.name}
+        previewUrl={sessionFile.previewUrl}
+        markup={markup}
+        realLengthInput={realLengthInput}
+        onRealLengthChange={setRealLengthInput}
+        onMarkupChange={setMarkup}
+        onBack={() => setWorkflowScreen("parameters")}
+      />
+    );
   }
 
   return (
@@ -176,9 +226,20 @@ export function ImportStep({ onCancel }: ImportStepProps) {
                   </p>
                 </div>
               )}
-              <button className="import-preview__replace" type="button" onClick={removeFile}>
-                Удалить файл
-              </button>
+              <div className="import-preview__file-actions">
+                <label className="import-preview__replace" htmlFor={replaceInputId}>
+                  <input
+                    id={replaceInputId}
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf"
+                    onChange={handleFileInput}
+                  />
+                  Заменить файл
+                </label>
+                <button className="import-preview__replace" type="button" onClick={removeFile}>
+                  Удалить файл
+                </button>
+              </div>
             </>
           ) : (
             <label
@@ -293,11 +354,18 @@ export function ImportStep({ onCancel }: ImportStepProps) {
           </div>
 
           <div className="import-step__actions">
-            <button className="button button--primary" type="button" disabled>
+            <button
+              className="button button--primary"
+              type="button"
+              disabled={!canOpenMarkup}
+              onClick={() => setWorkflowScreen("markup")}
+            >
               Перейти к разметке
             </button>
             <p>
-              {normalizedPlan && readyForMarkup
+              {plan?.sourceType === "pdf" && readyForMarkup
+                ? "Интерактивная разметка PDF будет добавлена позже."
+                : normalizedPlan && readyForMarkup
                 ? "Следующий этап — разметка стен и помещений."
                 : "Загрузите файл и задайте параметры импорта."}
             </p>

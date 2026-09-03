@@ -653,7 +653,11 @@ button { font: inherit; }
 .import-preview__pdf { display: grid; min-height: clamp(20rem, 70vw, 34rem); align-content: center; justify-items: center; gap: 1.5rem; padding: clamp(2rem, 6vw, 5rem); border: 1px solid var(--line); background: var(--subtle); text-align: center; }
 .import-preview__pdf span { font-family: Georgia, "Times New Roman", serif; font-size: clamp(4rem, 14vw, 8rem); letter-spacing: -0.06em; line-height: 0.8; }
 .import-preview__pdf p { max-width: 28rem; margin: 0; color: var(--muted); font-size: 0.875rem; }
-.import-preview__replace { width: 100%; min-height: 2.75rem; border: 1px solid var(--line); border-top: 0; background: transparent; color: var(--foreground); cursor: pointer; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.import-preview__file-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.import-preview__replace { display: flex; width: 100%; min-height: 2.75rem; align-items: center; justify-content: center; border: 1px solid var(--line); border-top: 0; background: transparent; color: var(--foreground); cursor: pointer; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.import-preview__replace + .import-preview__replace { border-left: 0; }
+.import-preview__replace input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.import-preview__replace:focus-within { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
 .import-step__error { min-height: 1.5rem; margin: 0.75rem 0 0; color: #73513f; font-size: 0.75rem; }
 
 .import-flow {
@@ -702,6 +706,199 @@ button { font: inherit; }
 .import-step__actions { display: grid; gap: 0.75rem; margin-top: 2rem; }
 .import-step__actions .button { width: 100%; }
 .import-step__actions p { margin: 0; color: var(--muted); font-size: 0.75rem; line-height: 1.5; }
+
+.plan-markup { padding-top: clamp(3.5rem, 7vw, 6.5rem); }
+
+.plan-markup__header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 1.25rem;
+  padding-bottom: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+.plan-markup__header > span {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.25rem, 7vw, 5rem);
+  letter-spacing: -0.06em;
+  line-height: 0.8;
+}
+
+.plan-markup__header h2,
+.plan-markup-summary h2 {
+  margin: 0.4rem 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.plan-markup__header div > p:not(.section-label) {
+  max-width: 42rem;
+  margin: 1.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+.plan-markup__layout,
+.plan-markup__main { display: grid; gap: 2rem; min-width: 0; }
+
+.plan-markup__instructions {
+  display: grid;
+  gap: 0.625rem;
+  padding-block: 1rem;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.plan-markup__instructions p { margin: 0; }
+.plan-markup__instructions p:last-child { color: var(--muted); font-size: 0.8125rem; }
+
+.plan-markup__workspace {
+  position: relative;
+  width: 100%;
+  height: clamp(25rem, 67vw, 46rem);
+  max-height: 76svh;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--subtle);
+}
+
+.plan-markup__workspace > img {
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.plan-markup__overlay {
+  position: absolute;
+  overflow: visible;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.plan-markup__wall line,
+.plan-markup__calibration-line {
+  fill: none;
+  stroke: var(--foreground);
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.plan-markup__wall circle {
+  fill: var(--surface);
+  stroke: var(--foreground);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.plan-markup__calibration-line {
+  stroke: var(--accent-strong);
+  stroke-dasharray: 8 6;
+}
+
+.plan-markup__calibration-point circle,
+.plan-markup__draft-point circle {
+  fill: var(--accent);
+  stroke: var(--foreground);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.plan-markup__calibration-point text,
+.plan-markup__draft-point text {
+  fill: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(12px, 2vw, 18px);
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: var(--surface);
+  stroke-width: 4px;
+  vector-effect: non-scaling-stroke;
+}
+
+.plan-markup__calibration-controls,
+.plan-markup__wall-controls {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.plan-markup__calibration-controls .field { padding-top: 0; }
+
+.plan-markup__reset-scale {
+  min-height: 2.75rem;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+  text-transform: uppercase;
+}
+
+.plan-markup-summary {
+  min-width: 0;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  border: 1px solid var(--line);
+  background: var(--subtle);
+}
+
+.plan-markup-summary h2 { font-size: clamp(2rem, 4vw, 3rem); }
+.plan-markup-summary dl { margin: 2rem 0 0; }
+
+.plan-markup-summary dl > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  padding-block: 0.875rem;
+  border-top: 1px solid var(--line);
+}
+
+.plan-markup-summary dt { color: var(--muted); font-size: 0.75rem; }
+.plan-markup-summary dd { margin: 0; font-family: Georgia, "Times New Roman", serif; white-space: nowrap; }
+
+.plan-markup-summary__calibration {
+  display: grid;
+  gap: 0.375rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.plan-markup-summary__calibration p,
+.plan-markup-summary__calibration small { margin: 0; color: var(--muted); font-size: 0.75rem; }
+.plan-markup-summary__calibration strong { font-family: Georgia, "Times New Roman", serif; font-size: 1.75rem; font-weight: 400; white-space: nowrap; }
+
+.plan-markup-summary__walls {
+  display: grid;
+  max-height: 18rem;
+  overflow-y: auto;
+  margin: 1.5rem 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+  list-style: none;
+}
+
+.plan-markup-summary__walls li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  min-height: 3rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.8125rem;
+}
+
+.plan-markup-summary__walls span { min-width: 0; white-space: nowrap; }
+.plan-markup-summary__walls button { min-width: 4.5rem; min-height: 2.75rem; border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 0.6875rem; text-transform: uppercase; }
+.plan-markup-summary > .button { width: 100%; margin-top: 1.5rem; }
+.plan-markup-summary__note { margin: 1rem 0 0; color: var(--muted); font-size: 0.75rem; line-height: 1.5; }
 
 .object-form { min-width: 0; }
 
@@ -2343,6 +2540,9 @@ button { font: inherit; }
   .planner-progress li:first-child { border-left: 0; }
   .planner-entry-mode > div { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .planner-entry-mode label + label { border-top: 0; border-left: 1px solid var(--line); }
+  .plan-markup__calibration-controls { grid-template-columns: minmax(12rem, 1fr) minmax(12rem, auto) minmax(10rem, auto); align-items: end; }
+  .plan-markup__wall-controls { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .plan-markup__reset-scale { grid-column: 1 / -1; }
   .object-form__fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .field:nth-child(odd) { padding-right: 1rem; }
   .field:nth-child(even) { padding-left: 1rem; border-left: 1px solid var(--line); }
@@ -2424,6 +2624,8 @@ button { font: inherit; }
   .object-summary { position: sticky; top: 2rem; }
   .import-step__layout { grid-template-columns: minmax(0, 1.45fr) minmax(18rem, 0.55fr); align-items: start; gap: clamp(3rem, 5vw, 5rem); }
   .import-summary { position: sticky; top: 2rem; }
+  .plan-markup__layout { grid-template-columns: minmax(0, 1.6fr) minmax(18rem, 0.4fr); align-items: start; gap: clamp(2rem, 4vw, 4rem); }
+  .plan-markup-summary { position: sticky; top: 2rem; }
   .rooms-step__layout {
     grid-template-columns: minmax(0, 1.45fr) minmax(18rem, 0.55fr);
     align-items: start;

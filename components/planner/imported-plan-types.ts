@@ -3,6 +3,30 @@ export type Point2D = {
   y: number;
 };
 
+/** Coordinates relative to the source image: 0,0 top-left; 1,1 bottom-right. */
+export type NormalizedPoint2D = Point2D;
+
+export type PlanScaleCalibration = {
+  pointA: NormalizedPoint2D;
+  pointB: NormalizedPoint2D;
+  realLengthMeters: number;
+  imageDistance: number;
+  metersPerNormalizedUnit: number;
+};
+
+export type ImportedWall = {
+  id: string;
+  start: NormalizedPoint2D;
+  end: NormalizedPoint2D;
+};
+
+export type ImportedPlanMarkup = {
+  fileSessionId: string;
+  calibrationPoints: NormalizedPoint2D[];
+  calibration: PlanScaleCalibration | null;
+  walls: ImportedWall[];
+};
+
 export type ImportedOpeningType = "door" | "window";
 
 export type ImportedOpening = {
