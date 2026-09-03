@@ -2,10 +2,15 @@
 
 import { useRef, useState } from "react";
 
+import { ImportStep } from "@/components/planner/import-step";
 import { ObjectStep } from "@/components/planner/object-step";
 import { MaterialsStep } from "@/components/planner/materials-step";
 import { createDefaultRoomFinishes } from "@/components/planner/material-utils";
 import { PlannerProgress } from "@/components/planner/planner-progress";
+import {
+  PlannerEntryModeControl,
+  type PlannerEntryMode,
+} from "@/components/planner/planner-entry-mode";
 import { RoomsStep } from "@/components/planner/rooms-step";
 import { StyleStep } from "@/components/planner/style-step";
 import { ThreeStep } from "@/components/planner/three-step";
@@ -33,6 +38,7 @@ const initialDesignData: PlannerDesignData = {
 
 export function PlannerShell() {
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4 | 5>(1);
+  const [entryMode, setEntryMode] = useState<PlannerEntryMode>("manual");
   const [data, setData] = useState<PlannerObjectData>(initialData);
   const [rooms, setRooms] = useState<PlannerRoom[]>([]);
   const [design, setDesign] = useState<PlannerDesignData>(initialDesignData);
@@ -158,7 +164,14 @@ export function PlannerShell() {
       <PlannerProgress currentStep={currentStep} />
 
       {currentStep === 1 ? (
-        <ObjectStep data={data} onChange={updateData} onContinue={openRoomsStep} />
+        <>
+          <PlannerEntryModeControl value={entryMode} onChange={setEntryMode} />
+          {entryMode === "manual" ? (
+            <ObjectStep data={data} onChange={updateData} onContinue={openRoomsStep} />
+          ) : (
+            <ImportStep onCancel={() => setEntryMode("manual")} />
+          )}
+        </>
       ) : currentStep === 2 ? (
         <RoomsStep
           objectData={data}
