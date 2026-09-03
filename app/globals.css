@@ -759,7 +759,7 @@ button { font: inherit; }
 
 .plan-markup__mode {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   border: 1px solid var(--line);
 }
 
@@ -815,6 +815,18 @@ button { font: inherit; }
   stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
 }
+
+.plan-markup__opening { cursor: pointer; outline: none; }
+.plan-markup__opening line { vector-effect: non-scaling-stroke; }
+.plan-markup__opening-hit { stroke: transparent; stroke-width: 22; }
+.plan-markup__opening-base { stroke: var(--surface); stroke-width: 11; }
+.plan-markup__opening-mark { stroke: var(--foreground); stroke-width: 5; stroke-linecap: square; }
+.plan-markup__opening--window .plan-markup__opening-base { stroke-width: 9; }
+.plan-markup__opening--window .plan-markup__opening-mark { stroke: var(--accent-strong); stroke-width: 3; stroke-dasharray: 8 3; stroke-linecap: butt; }
+.plan-markup__opening.is-selected .plan-markup__opening-mark,
+.plan-markup__opening:focus-visible .plan-markup__opening-mark { stroke: var(--accent-strong); stroke-width: 7; }
+.plan-markup__opening--window.is-selected .plan-markup__opening-mark,
+.plan-markup__opening--window:focus-visible .plan-markup__opening-mark { stroke: var(--foreground); stroke-width: 5; }
 
 .plan-markup__saved-room-fills polygon {
   fill: color-mix(in srgb, var(--accent) 15%, transparent);
@@ -889,7 +901,8 @@ button { font: inherit; }
 
 .plan-markup__calibration-controls,
 .plan-markup__wall-controls,
-.plan-markup__room-controls {
+.plan-markup__room-controls,
+.plan-markup__opening-controls {
   display: grid;
   gap: 0.75rem;
   min-width: 0;
@@ -897,8 +910,41 @@ button { font: inherit; }
 
 .plan-markup__calibration-controls .field { padding-top: 0; }
 .plan-markup__wall-controls > p,
-.plan-markup__room-controls > p { margin: 0; color: var(--muted); font-size: 0.8125rem; }
+.plan-markup__room-controls > p,
+.plan-markup__opening-controls > p { margin: 0; color: var(--muted); font-size: 0.8125rem; }
 .plan-markup__message { min-height: 1.5rem; margin: -1rem 0 0; color: #73513f; font-size: 0.75rem; line-height: 1.5; }
+
+.plan-markup__opening-type {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--line);
+}
+
+.plan-markup__opening-type button {
+  min-height: 2.75rem;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.plan-markup__opening-type button + button { border-left: 1px solid var(--line); }
+.plan-markup__opening-type button[aria-pressed="true"] { background: var(--foreground); color: var(--surface); }
+
+.plan-markup__opening-editor { display: grid; gap: 1rem; padding: 1.25rem; border: 1px solid var(--line); background: var(--subtle); }
+.plan-markup__opening-editor header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+.plan-markup__opening-editor header div { display: grid; gap: 0.25rem; min-width: 0; }
+.plan-markup__opening-editor header span { color: var(--muted); font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.plan-markup__opening-editor header strong { font-family: Georgia, "Times New Roman", serif; font-size: 1.25rem; font-weight: 400; }
+.plan-markup__opening-editor header > button { min-width: 4.5rem; min-height: 2.75rem; border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 0.6875rem; text-transform: uppercase; }
+.plan-markup__opening-fields { display: grid; gap: 0.75rem; }
+.plan-markup__opening-fields label,
+.plan-markup__opening-position { display: grid; gap: 0.4rem; color: var(--muted); font-size: 0.6875rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.plan-markup__opening-fields input { width: 100%; min-width: 0; min-height: 2.75rem; border: 1px solid var(--line); padding: 0.625rem; background: var(--surface); color: var(--foreground); font: inherit; font-size: 1rem; }
+.plan-markup__opening-position input { width: 100%; min-height: 2.75rem; accent-color: var(--foreground); }
 
 .plan-markup__reset-scale {
   min-height: 2.75rem;
@@ -972,6 +1018,7 @@ button { font: inherit; }
 
 .plan-markup-summary__section { margin-top: 1.75rem; }
 .plan-markup-summary__section h3 { margin: 0; color: var(--muted); font-size: 0.6875rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.plan-markup-summary__collections { display: flex; flex-direction: column; min-width: 0; }
 
 .plan-markup-summary__rooms {
   display: grid;
@@ -995,6 +1042,24 @@ button { font: inherit; }
 .plan-markup-summary__rooms input { grid-column: 1 / -1; width: 100%; min-width: 0; min-height: 2.75rem; border: 1px solid var(--line); padding: 0.45rem 0.625rem; background: var(--surface); color: var(--foreground); font-family: Georgia, "Times New Roman", serif; font-size: 1rem; }
 .plan-markup-summary__rooms p { margin: 0; color: var(--muted); font-size: 0.75rem; line-height: 1.45; }
 .plan-markup-summary__rooms button { grid-column: 2; grid-row: 3 / span 2; min-width: 4.5rem; min-height: 2.75rem; border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 0.6875rem; text-transform: uppercase; }
+
+.plan-markup-summary__openings {
+  display: grid;
+  max-height: none;
+  overflow: visible;
+  margin: 1rem 0 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+  list-style: none;
+}
+
+.plan-markup-summary__openings li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: stretch; border-bottom: 1px solid var(--line); }
+.plan-markup-summary__openings li > button:first-child { display: grid; gap: 0.2rem; min-width: 0; min-height: 4.5rem; padding: 0.65rem 0.5rem 0.65rem 0; border: 0; background: transparent; color: var(--foreground); cursor: pointer; text-align: left; overflow-wrap: anywhere; }
+.plan-markup-summary__openings li > button:first-child strong { font-size: 0.75rem; }
+.plan-markup-summary__openings li > button:first-child span { color: var(--muted); font-size: 0.6875rem; line-height: 1.35; }
+.plan-markup-summary__openings li > button:last-child { align-self: stretch; min-width: 4.5rem; min-height: 2.75rem; border: 0; border-left: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; font-size: 0.6875rem; text-transform: uppercase; }
+.plan-markup-summary__openings li.is-selected { box-shadow: inset 3px 0 0 var(--foreground); }
+.plan-markup-summary__openings li.is-selected > button:first-child { padding-left: 0.75rem; }
 .plan-markup-summary > .button { width: 100%; margin-top: 1.5rem; }
 .plan-markup-summary__note { margin: 1rem 0 0; color: var(--muted); font-size: 0.75rem; line-height: 1.5; }
 
@@ -2643,6 +2708,7 @@ button { font: inherit; }
   .plan-markup__wall-controls > p { grid-column: 1 / -1; }
   .plan-markup__room-controls { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .plan-markup__room-controls > p { grid-column: 1 / -1; }
+  .plan-markup__opening-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .plan-markup__reset-scale { grid-column: 1 / -1; }
   .object-form__fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .field:nth-child(odd) { padding-right: 1rem; }
@@ -2735,11 +2801,26 @@ button { font: inherit; }
     scrollbar-gutter: stable;
   }
   .plan-markup-summary__walls,
-  .plan-markup-summary__rooms { overflow-y: auto; overscroll-behavior: contain; }
+  .plan-markup-summary__rooms,
+  .plan-markup-summary__openings { overflow-y: auto; overscroll-behavior: contain; }
   .plan-markup-summary--walls-mode .plan-markup-summary__walls { max-height: 17rem; }
   .plan-markup-summary--walls-mode .plan-markup-summary__rooms { max-height: 7rem; }
+  .plan-markup-summary--walls-mode .plan-markup-summary__openings { max-height: 7rem; }
   .plan-markup-summary--rooms-mode .plan-markup-summary__walls { max-height: 5.5rem; margin-bottom: 0.5rem; }
   .plan-markup-summary--rooms-mode .plan-markup-summary__rooms { max-height: 22rem; }
+  .plan-markup-summary--rooms-mode .plan-markup-summary__openings { max-height: 7rem; }
+  .plan-markup-summary--openings-mode .plan-markup-summary__walls,
+  .plan-markup-summary--openings-mode .plan-markup-summary__rooms { max-height: 5.5rem; margin-bottom: 0.5rem; }
+  .plan-markup-summary--openings-mode .plan-markup-summary__openings { max-height: 22rem; }
+  .plan-markup-summary--walls-mode .plan-markup-summary__section--walls,
+  .plan-markup-summary--rooms-mode .plan-markup-summary__section--rooms,
+  .plan-markup-summary--openings-mode .plan-markup-summary__section--openings { order: 1; }
+  .plan-markup-summary--walls-mode .plan-markup-summary__section--rooms,
+  .plan-markup-summary--rooms-mode .plan-markup-summary__section--walls,
+  .plan-markup-summary--openings-mode .plan-markup-summary__section--walls { order: 2; }
+  .plan-markup-summary--walls-mode .plan-markup-summary__section--openings,
+  .plan-markup-summary--rooms-mode .plan-markup-summary__section--openings,
+  .plan-markup-summary--openings-mode .plan-markup-summary__section--rooms { order: 3; }
   .rooms-step__layout {
     grid-template-columns: minmax(0, 1.45fr) minmax(18rem, 0.55fr);
     align-items: start;

@@ -1,4 +1,6 @@
 import type {
+  ImportedMarkupOpening,
+  ImportedPlanMarkup,
   ImportedRoomPolygon,
   ImportedWall,
   NormalizedPoint2D,
@@ -16,6 +18,18 @@ export type Rect2D = {
 export type Size2D = {
   width: number;
   height: number;
+};
+
+export type WallHit = {
+  wallId: string;
+  position: number;
+  point: NormalizedPoint2D;
+  distancePixels: number;
+};
+
+export type OpeningPixelSpan = {
+  start: NormalizedPoint2D;
+  end: NormalizedPoint2D;
 };
 
 const GEOMETRY_EPSILON = 1e-9;
@@ -126,6 +140,102 @@ export function getWallLengthMeters(wall: ImportedWall, calibration: PlanScaleCa
     height: calibration.imageHeightPx,
   });
   return pixelDistance === null ? null : getRealDistanceFromCalibration(pixelDistance, calibration);
+}
+
+export function getWallLengthPixels(wall: ImportedWall, imageSize: Size2D) {
+  return getPixelDistance(wall.start, wall.end, imageSize);
+}
+
+export function getPointOnWall(wall: ImportedWall, position: number): NormalizedPoint2D | null {
+  if (
+    !isNormalizedPoint(wall.start) || !isNormalizedPoint(wall.end) ||
+    !Number.isFinite(position) || position < 0 || position > 1
+  ) return null;
+  return {
+    x: wall.start.x + (wall.end.x - wall.start.x) * position,
+    y: wall.start.y + (wall.end.y - wall.start.y) * position,
+  };
+}
+
+export function getNearestWallHit(
+  point: NormalizedPoint2D,
+  walls: ImportedWall[],
+  imageSize: Size2D,
+  hitThresholdPixels = 14,
+): WallHit | null {
+  if (
+    !isNormalizedPoint(point) || !isPositiveSize(imageSize) ||
+    !Number.isFinite(hitThresholdPixels) || hitThresholdPixels < 0
+  ) return null;
+
+  const pointX = point.x * imageSize.width;
+  const pointY = point.y * imageSize.height;
+  let nearest: WallHit | null = null;
+  for (const wall of walls) {
+    if (!isNormalizedPoint(wall.start) || !isNormalizedPoint(wall.end)) continue;
+    const startX = wall.start.x * imageSize.width;
+    const startY = wall.start.y * imageSize.height;
+    const deltaX = (wall.end.x - wall.start.x) * imageSize.width;
+    const deltaY = (wall.end.y - wall.start.y) * imageSize.height;
+    const squaredLength = deltaX ** 2 + deltaY ** 2;
+    if (squaredLength <= GEOMETRY_EPSILON) continue;
+    const position = Math.max(0, Math.min(1,
+      ((pointX - startX) * deltaX + (pointY - startY) * deltaY) / squaredLength,
+    ));
+    const projectedX = startX + deltaX * position;
+    const projectedY = startY + deltaY * position;
+    const distancePixels = Math.hypot(pointX - projectedX, pointY - projectedY);
+    if (distancePixels > hitThresholdPixels || (nearest && distancePixels >= nearest.distancePixels)) continue;
+    nearest = {
+      wallId: wall.id,
+      position,
+      point: { x: projectedX / imageSize.width, y: projectedY / imageSize.height },
+      distancePixels,
+    };
+  }
+  return nearest;
+}
+
+export function canOpeningFitOnWall(
+  wall: ImportedWall,
+  position: number,
+  widthMeters: number,
+  calibration: PlanScaleCalibration,
+) {
+  const wallLength = getWallLengthMeters(wall, calibration);
+  if (
+    wallLength === null || wallLength <= 0 ||
+    !Number.isFinite(position) || position < 0 || position > 1 ||
+    !Number.isFinite(widthMeters) || widthMeters <= 0
+  ) return false;
+  const halfWidth = widthMeters / 2;
+  return halfWidth <= wallLength * position + GEOMETRY_EPSILON &&
+    halfWidth <= wallLength * (1 - position) + GEOMETRY_EPSILON;
+}
+
+export function getOpeningPixelSpan(
+  opening: ImportedMarkupOpening,
+  wall: ImportedWall,
+  calibration: PlanScaleCalibration,
+): OpeningPixelSpan | null {
+  if (!canOpeningFitOnWall(wall, opening.position, opening.widthMeters, calibration)) return null;
+  const wallLengthPixels = getWallLengthPixels(wall, {
+    width: calibration.imageWidthPx,
+    height: calibration.imageHeightPx,
+  });
+  if (wallLengthPixels === null || wallLengthPixels <= 0) return null;
+  const halfPosition = (opening.widthMeters / calibration.metersPerPixel / 2) / wallLengthPixels;
+  const start = getPointOnWall(wall, opening.position - halfPosition);
+  const end = getPointOnWall(wall, opening.position + halfPosition);
+  return start && end ? { start, end } : null;
+}
+
+export function removeWallWithOpenings(markup: ImportedPlanMarkup, wallId: string): ImportedPlanMarkup {
+  return {
+    ...markup,
+    walls: markup.walls.filter((wall) => wall.id !== wallId),
+    openings: markup.openings.filter((opening) => opening.wallId !== wallId),
+  };
 }
 
 export function getTotalWallLengthMeters(walls: ImportedWall[], calibration: PlanScaleCalibration) {

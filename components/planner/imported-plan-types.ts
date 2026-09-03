@@ -28,12 +28,23 @@ export type ImportedRoomPolygon = {
   vertices: NormalizedPoint2D[];
 };
 
+export type ImportedMarkupOpening = {
+  id: string;
+  type: ImportedOpeningType;
+  wallId: string;
+  position: number;
+  widthMeters: number;
+  heightMeters: number;
+  sillHeightMeters: number;
+};
+
 export type ImportedPlanMarkup = {
   fileSessionId: string;
   calibrationPoints: NormalizedPoint2D[];
   calibration: PlanScaleCalibration | null;
   walls: ImportedWall[];
   rooms: ImportedRoomPolygon[];
+  openings: ImportedMarkupOpening[];
 };
 
 export type ImportedOpeningType = "door" | "window";
