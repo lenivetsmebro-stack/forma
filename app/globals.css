@@ -828,6 +828,17 @@ button { font: inherit; }
 .plan-markup__opening--window.is-selected .plan-markup__opening-mark,
 .plan-markup__opening--window:focus-visible .plan-markup__opening-mark { stroke: var(--foreground); stroke-width: 5; }
 
+.plan-markup__graph-overlay { pointer-events: none; }
+.plan-markup__graph-boundaries line { stroke: var(--accent-strong); stroke-width: 2; opacity: 0.45; vector-effect: non-scaling-stroke; }
+.plan-markup__graph-boundaries .is-partial line { stroke: #73513f; stroke-width: 3; stroke-dasharray: 10 5; opacity: 0.85; }
+.plan-markup__graph-boundaries .is-no-nearby-wall line,
+.plan-markup__graph-boundaries .is-angle-mismatch line,
+.plan-markup__graph-boundaries .is-offset-too-large line { stroke: #73513f; stroke-width: 4; stroke-dasharray: 7 6; opacity: 1; }
+.plan-markup__graph-boundaries .is-active line { stroke-width: 7; stroke-dasharray: none; }
+.plan-markup__graph-boundaries text { fill: #73513f; font-family: Arial, Helvetica, sans-serif; font-size: clamp(11px, 1.5vw, 15px); font-weight: 700; paint-order: stroke; stroke: var(--surface); stroke-width: 4px; text-anchor: middle; vector-effect: non-scaling-stroke; }
+.plan-markup__graph-nodes circle { fill: var(--surface); stroke: var(--foreground); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.plan-markup__graph-nodes circle.is-dangling { fill: var(--accent); stroke-width: 3; }
+
 .plan-markup__saved-room-fills polygon {
   fill: color-mix(in srgb, var(--accent) 15%, transparent);
   stroke: none;
@@ -865,6 +876,36 @@ button { font: inherit; }
   stroke-width: 2;
   vector-effect: non-scaling-stroke;
 }
+
+.plan-markup__room-preview-line {
+  stroke: var(--foreground);
+  stroke-dasharray: 3 6;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.plan-markup__snap-preview circle,
+.plan-markup__snap-preview rect {
+  fill: color-mix(in srgb, var(--surface) 88%, transparent);
+  stroke: var(--foreground);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.plan-markup__snap-preview.is-node circle {
+  fill: var(--accent);
+  stroke-width: 2.5;
+}
+
+.plan-markup__snap-preview.is-wall rect {
+  fill: var(--surface);
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: rotate(45deg);
+}
+
+.plan-markup__snap-preview.is-free circle { stroke-dasharray: 3 3; }
+.plan-markup__snap-preview.is-closure circle { fill: var(--foreground); stroke: var(--surface); }
 
 .plan-markup__room-draft circle {
   fill: var(--surface);
@@ -913,6 +954,7 @@ button { font: inherit; }
 .plan-markup__room-controls > p,
 .plan-markup__opening-controls > p { margin: 0; color: var(--muted); font-size: 0.8125rem; }
 .plan-markup__message { min-height: 1.5rem; margin: -1rem 0 0; color: #73513f; font-size: 0.75rem; line-height: 1.5; }
+.plan-markup__snap-hint { min-height: 1.25rem; margin: -1rem 0 0; color: var(--muted); font-size: 0.75rem; letter-spacing: 0.02em; }
 
 .plan-markup__opening-type {
   display: grid;
@@ -992,6 +1034,39 @@ button { font: inherit; }
 .plan-markup-summary__calibration p,
 .plan-markup-summary__calibration small { margin: 0; color: var(--muted); font-size: 0.75rem; }
 .plan-markup-summary__calibration strong { font-family: Georgia, "Times New Roman", serif; font-size: 1.75rem; font-weight: 400; white-space: nowrap; }
+
+.plan-markup-graph { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--foreground); }
+.plan-markup-graph__heading { display: grid; gap: 0.75rem; }
+.plan-markup-graph__heading p { margin: 0; }
+.plan-markup-graph__heading h3 { margin: 0.35rem 0 0; font-family: Georgia, "Times New Roman", serif; font-size: 1.5rem; font-weight: 400; }
+.plan-markup-graph__heading button { min-height: 2.75rem; border: 1px solid var(--line); background: transparent; color: var(--foreground); cursor: pointer; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.plan-markup-graph__heading button[aria-pressed="true"] { border-color: var(--foreground); background: var(--surface); }
+.plan-markup-graph dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 1rem 0 0; border-top: 1px solid var(--line); }
+.plan-markup-graph dl > div { display: block; min-width: 0; padding: 0.65rem 0.5rem 0.65rem 0; border-top: 0; }
+.plan-markup-graph dl > div:nth-child(even) { padding-inline: 0.5rem 0; border-left: 1px solid var(--line); }
+.plan-markup-graph dl dd { margin-top: 0.25rem; text-align: left; }
+.plan-markup-graph__details { display: grid; gap: 1rem; margin-top: 1rem; }
+.plan-markup-graph__runtime-proof { display: grid; gap: 0.2rem; border: 1px solid var(--line); padding: 0.65rem; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.625rem; overflow-wrap: anywhere; }
+.plan-markup-graph__runtime-proof strong { margin-bottom: 0.2rem; color: var(--foreground); font-family: Arial, Helvetica, sans-serif; font-size: 0.6875rem; text-transform: uppercase; }
+.plan-markup-graph__rooms,
+.plan-markup-graph__diagnostics { display: grid; gap: 0; margin: 0; padding: 0; border-top: 1px solid var(--line); list-style: none; }
+.plan-markup-graph__rooms li { display: grid; gap: 0.2rem; padding-block: 0.65rem; border-bottom: 1px solid var(--line); }
+.plan-markup-graph__rooms strong { font-size: 0.75rem; }
+.plan-markup-graph__rooms span { color: var(--muted); font-size: 0.6875rem; line-height: 1.4; }
+.plan-markup-graph__segments { display: grid; gap: 0.35rem; margin: 0.45rem 0 0; padding: 0; list-style: none; }
+.plan-markup-graph__segments li { padding: 0; border: 0; }
+.plan-markup-graph__segments button { display: grid; gap: 0.15rem; width: 100%; min-height: 2.75rem; padding: 0.55rem; border: 1px solid var(--line); background: var(--surface); color: var(--foreground); cursor: pointer; text-align: left; }
+.plan-markup-graph__segments button[aria-pressed="true"] { border-color: var(--foreground); box-shadow: inset 3px 0 0 var(--foreground); }
+.plan-markup-graph__segments button strong { font-size: 0.6875rem; }
+.plan-markup-graph__segments button span { font-size: 0.625rem; }
+.plan-markup-graph__trace { border-top: 1px dotted var(--line); padding: 0.5rem 0.625rem 0.65rem; }
+.plan-markup-graph__trace summary { color: var(--muted); cursor: pointer; font-size: 0.6875rem; text-transform: uppercase; }
+.plan-markup-graph__trace p { margin: 0.4rem 0 0; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.625rem; overflow-wrap: anywhere; }
+.plan-markup-graph__trace ul { display: grid; gap: 0.5rem; margin: 0.6rem 0 0; padding: 0; list-style: none; }
+.plan-markup-graph__trace li { display: grid; gap: 0.15rem; border-left: 2px solid var(--line); padding-left: 0.5rem; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.625rem; overflow-wrap: anywhere; }
+.plan-markup-graph__trace li strong { color: var(--foreground); }
+.plan-markup-graph__diagnostics { max-height: 10rem; overflow-y: auto; }
+.plan-markup-graph__diagnostics li { padding-block: 0.55rem; border-bottom: 1px solid var(--line); color: #73513f; font-size: 0.6875rem; line-height: 1.4; }
 
 .plan-markup-summary__walls {
   display: grid;

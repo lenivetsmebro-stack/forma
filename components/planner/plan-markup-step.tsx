@@ -4,6 +4,13 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent, PointerEvent as ReactPointerEvent } from "react";
 
+import {
+  buildArchitecturalGraph,
+  getNodeDegree,
+  type RoomBoundarySegmentStatus,
+  type RoomBoundaryStatus,
+} from "@/components/planner/architectural-graph";
+
 import type {
   ImportedMarkupOpening,
   ImportedOpeningType,
@@ -32,6 +39,10 @@ import {
   type Rect2D,
   type Size2D,
 } from "@/components/planner/plan-markup-utils";
+import {
+  getRoomVertexSnap,
+  type RoomVertexSnapResult,
+} from "@/components/planner/room-snapping";
 
 type MarkupMode = "walls" | "rooms" | "openings";
 
@@ -54,6 +65,23 @@ const numberFormatter = new Intl.NumberFormat("ru-RU", {
   maximumFractionDigits: 2,
 });
 
+const ROOM_BOUNDARY_STATUS: Record<RoomBoundaryStatus, string> = {
+  linked: "Связано",
+  partial: "Частично связано",
+  unlinked: "Не связано",
+};
+
+const ROOM_SEGMENT_STATUS: Record<RoomBoundarySegmentStatus, string> = {
+  MATCHED: "Совпадает со стеной",
+  PARTIAL: "Частичное покрытие",
+  NO_NEARBY_WALL: "Рядом нет размеченной стены",
+  ANGLE_MISMATCH: "Направление стены не совпадает",
+  OFFSET_TOO_LARGE: "Слишком большое смещение",
+  COVERAGE_GAP: "Разрыв между участками покрытия",
+  AMBIGUOUS_CANDIDATES: "Найдено несколько равнозначных стен",
+  MISSING_BOUNDARY_WALL: "Для этой границы не размечена подходящая стена",
+};
+
 function formatLength(value: number | null) {
   return value === null || !Number.isFinite(value)
     ? "—"
@@ -64,6 +92,10 @@ function formatArea(value: number | null) {
   return value === null || !Number.isFinite(value)
     ? "—"
     : `${numberFormatter.format(value)} м²`;
+}
+
+function formatPoint(point: { x: number; y: number }, maximumFractionDigits = 4) {
+  return `${numberFormatter.format(Number(point.x.toFixed(maximumFractionDigits)))}, ${numberFormatter.format(Number(point.y.toFixed(maximumFractionDigits)))}`;
 }
 
 function getNextEntityNumber(ids: string[], marker: string) {
@@ -93,6 +125,9 @@ export function PlanMarkupStep({
   const [draftRoomVertices, setDraftRoomVertices] = useState<NormalizedPoint2D[]>([]);
   const [openingType, setOpeningType] = useState<ImportedOpeningType>("door");
   const [selectedOpeningId, setSelectedOpeningId] = useState<string | null>(null);
+  const [showGraphDiagnostics, setShowGraphDiagnostics] = useState(false);
+  const [activeBoundarySegment, setActiveBoundarySegment] = useState<string | null>(null);
+  const [roomSnapPreview, setRoomSnapPreview] = useState<RoomVertexSnapResult | null>(null);
   const [geometryMessage, setGeometryMessage] = useState("");
 
   useEffect(() => {
@@ -136,6 +171,16 @@ export function PlanMarkupStep({
   const imageWidth = intrinsicSize?.width ?? 1;
   const imageHeight = intrinsicSize?.height ?? 1;
   const selectedOpening = markup.openings.find((opening) => opening.id === selectedOpeningId) ?? null;
+  const architecturalGraph = useMemo(
+    () => intrinsicSize
+      ? buildArchitecturalGraph(markup, {
+          imageWidthPx: intrinsicSize.width,
+          imageHeightPx: intrinsicSize.height,
+        })
+      : null,
+    [intrinsicSize, markup],
+  );
+  const linkedRoomCount = architecturalGraph?.roomBoundaries.filter((room) => room.status === "linked").length ?? 0;
 
   function x(point: NormalizedPoint2D) {
     return point.x * imageWidth;
@@ -198,6 +243,26 @@ export function PlanMarkupStep({
     setGeometryMessage("");
   }
 
+  function getRoomSnap(point: NormalizedPoint2D) {
+    if (!architecturalGraph || !intrinsicSize) return null;
+    return getRoomVertexSnap(point, architecturalGraph, markup.walls, {
+      imageWidthPx: intrinsicSize.width,
+      imageHeightPx: intrinsicSize.height,
+      firstDraftVertex: draftRoomVertices[0],
+    });
+  }
+
+  function selectMarkupMode(mode: MarkupMode) {
+    setMarkupMode(mode);
+    setRoomSnapPreview(null);
+  }
+
+  function handlePointerMove(event: ReactPointerEvent<SVGSVGElement>) {
+    if (!calibration || markupMode !== "rooms") return;
+    const point = getPointFromPointer(event);
+    setRoomSnapPreview(point ? getRoomSnap(point) : null);
+  }
+
   function handlePointerDown(event: ReactPointerEvent<SVGSVGElement>) {
     if (event.pointerType === "mouse" && event.button !== 0) return;
     const point = getPointFromPointer(event);
@@ -207,7 +272,13 @@ export function PlanMarkupStep({
     } else if (markupMode === "walls") {
       addWallPoint(point);
     } else if (markupMode === "rooms") {
-      addRoomVertex(point);
+      const snap = getRoomSnap(point);
+      if (snap?.closesDraft && draftRoomVertices.length >= 3) {
+        setRoomSnapPreview(snap);
+        setGeometryMessage("Контур готов к замыканию. Нажмите «Замкнуть помещение».");
+      } else if (snap) {
+        addRoomVertex(snap.point);
+      }
     } else if (intrinsicSize) {
       const renderedWidth = event.currentTarget.getBoundingClientRect().width;
       const hitThreshold = renderedWidth > 0 ? 14 * intrinsicSize.width / renderedWidth : 14;
@@ -279,6 +350,7 @@ export function PlanMarkupStep({
     };
     onMarkupChange({ ...markup, rooms: [...markup.rooms, room] });
     setDraftRoomVertices([]);
+    setRoomSnapPreview(null);
     setGeometryMessage("");
   }
 
@@ -378,13 +450,13 @@ export function PlanMarkupStep({
 
           {calibration && (
             <div className="plan-markup__mode" role="group" aria-label="Режим разметки">
-              <button type="button" aria-pressed={markupMode === "walls"} onClick={() => setMarkupMode("walls")}>
+              <button type="button" aria-pressed={markupMode === "walls"} onClick={() => selectMarkupMode("walls")}>
                 Стены
               </button>
-              <button type="button" aria-pressed={markupMode === "rooms"} onClick={() => setMarkupMode("rooms")}>
+              <button type="button" aria-pressed={markupMode === "rooms"} onClick={() => selectMarkupMode("rooms")}>
                 Помещения
               </button>
-              <button type="button" aria-pressed={markupMode === "openings"} onClick={() => setMarkupMode("openings")}>
+              <button type="button" aria-pressed={markupMode === "openings"} onClick={() => selectMarkupMode("openings")}>
                 Проёмы
               </button>
             </div>
@@ -415,6 +487,8 @@ export function PlanMarkupStep({
                 role="group"
                 aria-label={!calibration ? "Область выбора масштаба" : `Область разметки: ${markupMode === "walls" ? "стены" : "помещения"}`}
                 onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerLeave={() => setRoomSnapPreview(null)}
               >
                 <g className="plan-markup__saved-room-fills">
                   {markup.rooms.map((room) => (
@@ -453,6 +527,45 @@ export function PlanMarkupStep({
                     </g>
                   );
                 })}
+                {showGraphDiagnostics && architecturalGraph && (
+                  <g className="plan-markup__graph-overlay" aria-label="Диагностика архитектурного графа">
+                    <g className="plan-markup__graph-boundaries">
+                      {architecturalGraph.roomBoundaries.flatMap((boundary, roomIndex) => {
+                        const room = markup.rooms.find((item) => item.id === boundary.roomId);
+                        if (!room) return [];
+                        return boundary.segments.flatMap((segment) => {
+                          const start = room.vertices[segment.segmentIndex];
+                          const end = room.vertices[(segment.segmentIndex + 1) % room.vertices.length];
+                          const segmentKey = `${room.id}:${segment.segmentIndex}`;
+                          return start && end ? [(
+                            <g
+                              key={segmentKey}
+                              className={`is-${segment.status.toLowerCase().replaceAll("_", "-")}${activeBoundarySegment === segmentKey ? " is-active" : ""}`}
+                            >
+                              <line x1={x(start)} y1={y(start)} x2={x(end)} y2={y(end)} />
+                              {segment.status !== "MATCHED" && (
+                                <text x={(x(start) + x(end)) / 2} y={(y(start) + y(end)) / 2}>
+                                  R{roomIndex + 1}·S{segment.segmentIndex + 1}
+                                </text>
+                              )}
+                            </g>
+                          )] : [];
+                        });
+                      })}
+                    </g>
+                    <g className="plan-markup__graph-nodes">
+                      {architecturalGraph.nodes.map((node) => (
+                        <circle
+                          key={node.id}
+                          className={getNodeDegree(node) === 1 ? "is-dangling" : undefined}
+                          cx={x(node.point)}
+                          cy={y(node.point)}
+                          r={markerRadius * (getNodeDegree(node) === 1 ? 0.75 : 0.5)}
+                        />
+                      ))}
+                    </g>
+                  </g>
+                )}
                 <g className="plan-markup__saved-room-outlines">
                   {markup.rooms.map((room) => {
                     const centroid = getPolygonCentroid(room.vertices);
@@ -473,12 +586,38 @@ export function PlanMarkupStep({
                 {markupMode === "rooms" && draftRoomVertices.length > 0 && (
                   <g className="plan-markup__room-draft">
                     <polyline points={polygonPoints(draftRoomVertices)} />
+                    {roomSnapPreview && (
+                      <line
+                        className="plan-markup__room-preview-line"
+                        x1={x(draftRoomVertices.at(-1) as NormalizedPoint2D)}
+                        y1={y(draftRoomVertices.at(-1) as NormalizedPoint2D)}
+                        x2={x(roomSnapPreview.point)}
+                        y2={y(roomSnapPreview.point)}
+                      />
+                    )}
                     {draftRoomVertices.map((point, index) => (
                       <g key={`room-draft-${index}`}>
                         <circle cx={x(point)} cy={y(point)} r={markerRadius} />
                         <text x={x(point)} y={y(point)} dx={markerRadius * 1.4} dy={-markerRadius * 1.4}>{index + 1}</text>
                       </g>
                     ))}
+                  </g>
+                )}
+                {markupMode === "rooms" && roomSnapPreview && (
+                  <g
+                    className={`plan-markup__snap-preview is-${roomSnapPreview.kind}${roomSnapPreview.closesDraft ? " is-closure" : ""}`}
+                    aria-hidden="true"
+                  >
+                    {roomSnapPreview.kind === "wall" ? (
+                      <rect
+                        x={x(roomSnapPreview.point) - markerRadius * 0.75}
+                        y={y(roomSnapPreview.point) - markerRadius * 0.75}
+                        width={markerRadius * 1.5}
+                        height={markerRadius * 1.5}
+                      />
+                    ) : (
+                      <circle cx={x(roomSnapPreview.point)} cy={y(roomSnapPreview.point)} r={markerRadius * 0.9} />
+                    )}
                   </g>
                 )}
                 {markup.calibrationPoints.length === 2 && (
@@ -506,6 +645,18 @@ export function PlanMarkupStep({
             )}
           </div>
 
+          {calibration && markupMode === "rooms" && (
+            <p className="plan-markup__snap-hint">
+              {roomSnapPreview?.closesDraft
+                ? "Привязка: первая точка контура"
+                : roomSnapPreview?.kind === "node"
+                  ? "Привязка: архитектурный узел"
+                  : roomSnapPreview?.kind === "wall"
+                    ? `Привязка: стена ${String(markup.walls.findIndex((wall) => wall.id === roomSnapPreview.wallId) + 1).padStart(2, "0")}`
+                    : "Свободная точка"}
+            </p>
+          )}
+
           <p className="plan-markup__message" aria-live="polite">{geometryMessage}</p>
 
           {!calibration ? (
@@ -532,7 +683,7 @@ export function PlanMarkupStep({
             <div className="plan-markup__room-controls">
               <p>Точек: <strong>{draftRoomVertices.length}</strong></p>
               <button className="button button--secondary" type="button" disabled={draftRoomVertices.length === 0} onClick={() => setDraftRoomVertices((current) => current.slice(0, -1))}>Отменить последнюю точку</button>
-              <button className="button button--secondary" type="button" disabled={draftRoomVertices.length === 0} onClick={() => { setDraftRoomVertices([]); setGeometryMessage(""); }}>Сбросить контур</button>
+              <button className="button button--secondary" type="button" disabled={draftRoomVertices.length === 0} onClick={() => { setDraftRoomVertices([]); setRoomSnapPreview(null); setGeometryMessage(""); }}>Сбросить контур</button>
               <button className="button button--primary" type="button" disabled={draftRoomVertices.length < 3} onClick={closeRoom}>Замкнуть помещение</button>
               <button className="plan-markup__reset-scale" type="button" onClick={resetCalibration}>Сбросить масштаб</button>
             </div>
@@ -599,6 +750,156 @@ export function PlanMarkupStep({
               <strong>{formatLength(calibration.realLengthMeters)}</strong>
               <small>Коэффициент: {new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 4 }).format(calibration.metersPerPixel)} м / px</small>
             </div>
+          )}
+
+          {architecturalGraph && (
+            <section className="plan-markup-graph" aria-labelledby="architectural-graph-title">
+              <div className="plan-markup-graph__heading">
+                <div>
+                  <p className="section-label">Архитектурная модель</p>
+                  <h3 id="architectural-graph-title">Связность плана</h3>
+                </div>
+                <button
+                  type="button"
+                  aria-pressed={showGraphDiagnostics}
+                  onClick={() => setShowGraphDiagnostics((current) => !current)}
+                >
+                  {showGraphDiagnostics ? "Скрыть" : "Показать диагностику"}
+                </button>
+              </div>
+              <dl>
+                <div><dt>Узлов</dt><dd>{architecturalGraph.nodes.length}</dd></div>
+                <div><dt>Связей стен</dt><dd>{architecturalGraph.edges.length}</dd></div>
+                <div><dt>Помещений связано</dt><dd>{linkedRoomCount} / {markup.rooms.length}</dd></div>
+                <div><dt>Проблем</dt><dd>{architecturalGraph.diagnostics.length}</dd></div>
+              </dl>
+              {showGraphDiagnostics && (
+                <div className="plan-markup-graph__details">
+                  <section className="plan-markup-graph__runtime-proof" aria-label="Проверка передачи стен">
+                    <strong>Путь данных стен</strong>
+                    <span>UI markup walls: {markup.walls.length}</span>
+                    <span>UI wall IDs: {markup.walls.length > 0 ? markup.walls.map((wall) => wall.id).join(", ") : "[]"}</span>
+                    <span>Connectivity input walls: {markup.walls.length}</span>
+                    <span>Connectivity input IDs: {markup.walls.length > 0 ? markup.walls.map((wall) => wall.id).join(", ") : "[]"}</span>
+                    <span>Function received walls: {architecturalGraph.runtimeTrace.functionReceivedWallCount}</span>
+                    <span>Function received IDs: {architecturalGraph.runtimeTrace.functionReceivedWallIds.length > 0 ? architecturalGraph.runtimeTrace.functionReceivedWallIds.join(", ") : "[]"}</span>
+                    <span>Source walls after normalization: {architecturalGraph.runtimeTrace.sourceWallCount}</span>
+                    <span>Source IDs: {architecturalGraph.runtimeTrace.sourceWallIds.length > 0 ? architecturalGraph.runtimeTrace.sourceWallIds.join(", ") : "[]"}</span>
+                    <span>Derived segments: {architecturalGraph.runtimeTrace.derivedSegmentCount}</span>
+                    <span>Nodes: {architecturalGraph.runtimeTrace.nodeCount}</span>
+                    <span>Edges: {architecturalGraph.runtimeTrace.edgeCount}</span>
+                  </section>
+                  {architecturalGraph.roomBoundaries.length > 0 && (
+                    <ul className="plan-markup-graph__rooms">
+                      {architecturalGraph.roomBoundaries.map((boundary) => {
+                        const room = markup.rooms.find((item) => item.id === boundary.roomId);
+                        return (
+                          <li key={boundary.roomId}>
+                            <strong>{room?.name || "Помещение"}</strong>
+                            <span>Покрытие стенами: {numberFormatter.format(boundary.coverageRatio * 100)}%</span>
+                            <span>{ROOM_BOUNDARY_STATUS[boundary.status]}{boundary.unmatchedSegmentCount > 0 ? ` · участков без стены: ${boundary.unmatchedSegmentCount}` : ""}</span>
+                            {boundary.segments.some((segment) => segment.status !== "MATCHED") && (
+                              <ul className="plan-markup-graph__segments">
+                                {boundary.segments.filter((segment) => segment.status !== "MATCHED").map((segment) => {
+                                  const segmentKey = `${boundary.roomId}:${segment.segmentIndex}`;
+                                  const wallIndex = markup.walls.findIndex((wall) => wall.id === segment.nearestWallId);
+                                  return (
+                                    <li key={segmentKey}>
+                                      <button
+                                        type="button"
+                                        aria-pressed={activeBoundarySegment === segmentKey}
+                                        onClick={() => setActiveBoundarySegment((current) => current === segmentKey ? null : segmentKey)}
+                                        onPointerEnter={() => setActiveBoundarySegment(segmentKey)}
+                                        onPointerLeave={() => setActiveBoundarySegment(null)}
+                                        onFocus={() => setActiveBoundarySegment(segmentKey)}
+                                        onBlur={() => setActiveBoundarySegment(null)}
+                                      >
+                                        <strong>Участок S{segment.segmentIndex + 1} · {numberFormatter.format(segment.coverageRatio * 100)}%</strong>
+                                        <span>{ROOM_SEGMENT_STATUS[segment.status]}</span>
+                                        {segment.status === "MISSING_BOUNDARY_WALL" && <span>Добавьте стену вдоль этого участка или исправьте её разметку.</span>}
+                                        <span>Покрыто: {numberFormatter.format(segment.coveredLengthPx)} из {numberFormatter.format(segment.segmentLengthPx)} px</span>
+                                        {segment.nearestWallId && <span>Ближайшая стена: {wallIndex >= 0 ? String(wallIndex + 1).padStart(2, "0") : segment.nearestWallId}</span>}
+                                        {segment.nearestWallDistancePx !== null && <span>Расстояние: {numberFormatter.format(segment.nearestWallDistancePx)} px</span>}
+                                      </button>
+                                      <details className="plan-markup-graph__trace">
+                                        <summary>Числовая трассировка</summary>
+                                        <p>Room N: {formatPoint(segment.trace.normalizedStart)} → {formatPoint(segment.trace.normalizedEnd)}</p>
+                                        <p>Room px: {formatPoint(segment.trace.pixelStart, 2)} → {formatPoint(segment.trace.pixelEnd, 2)}</p>
+                                        <p>Совместимых исходных стен: {segment.trace.compatibleSourceWallIds.length}</p>
+                                        <p>Совместимых derived segments: {segment.trace.compatibleDerivedEdgeIds.length}</p>
+                                        <details>
+                                          <summary>Source → derived inventory</summary>
+                                          <ul>
+                                            {architecturalGraph.wallInventory.map((wall) => {
+                                              const sourceWallIndex = markup.walls.findIndex((item) => item.id === wall.sourceWallId);
+                                              const comparison = segment.trace.sourceCandidates.find((candidate) => candidate.sourceWallId === wall.sourceWallId);
+                                              return (
+                                                <li key={wall.sourceWallId}>
+                                                  <strong>Стена {sourceWallIndex >= 0 ? String(sourceWallIndex + 1).padStart(2, "0") : wall.sourceWallId} · {wall.sourceWallId}</strong>
+                                                  <span>N: {formatPoint(wall.normalizedStart)} → {formatPoint(wall.normalizedEnd)}</span>
+                                                  <span>px: {formatPoint(wall.pixelStart, 2)} → {formatPoint(wall.pixelEnd, 2)} · {numberFormatter.format(wall.sourceLengthPx)} px</span>
+                                                  <span>Ориентация: {wall.orientation}</span>
+                                                  {comparison && (
+                                                    <>
+                                                      <span>К S{segment.segmentIndex + 1}: угол {numberFormatter.format(comparison.angleDifferenceDegrees)}° · перпендикуляр {comparison.perpendicularDistancePx === null ? "—" : `${numberFormatter.format(comparison.perpendicularDistancePx)} px`}</span>
+                                                      <span>Overlap: {numberFormatter.format(comparison.overlapLengthPx)} px · класс: {comparison.auditClass}</span>
+                                                    </>
+                                                  )}
+                                                  <span>Derived: {wall.derivedSegments.length > 0 ? wall.derivedSegments.map((edge) => `${edge.id} (${edge.startNodeId}→${edge.endNodeId})`).join(", ") : "нет"}</span>
+                                                </li>
+                                              );
+                                            })}
+                                          </ul>
+                                        </details>
+                                        <p>Source candidates:</p>
+                                        <ul>
+                                          {segment.trace.sourceCandidates.map((candidate) => {
+                                            const sourceWallIndex = markup.walls.findIndex((wall) => wall.id === candidate.sourceWallId);
+                                            return (
+                                              <li key={candidate.sourceWallId}>
+                                                <strong>Стена {sourceWallIndex >= 0 ? String(sourceWallIndex + 1).padStart(2, "0") : candidate.sourceWallId}</strong>
+                                                <span>Угол: {numberFormatter.format(candidate.angleDifferenceDegrees)}° · расстояние: {numberFormatter.format(candidate.segmentDistancePx)} px</span>
+                                                <span>Перпендикуляр: {candidate.perpendicularDistancePx === null ? "—" : `${numberFormatter.format(candidate.perpendicularDistancePx)} px`} · результат: {candidate.rejectionReason}</span>
+                                              </li>
+                                            );
+                                          })}
+                                        </ul>
+                                        <p>Derived candidates:</p>
+                                        <ul>
+                                          {segment.trace.candidates.map((candidate, candidateIndex) => {
+                                            const candidateWallIndex = markup.walls.findIndex((wall) => wall.id === candidate.sourceWallId);
+                                            return (
+                                              <li key={`${candidate.sourceWallId}:${candidateIndex}`}>
+                                                <strong>Стена {candidateWallIndex >= 0 ? String(candidateWallIndex + 1).padStart(2, "0") : candidate.sourceWallId}</strong>
+                                                <span>N: {formatPoint(candidate.normalizedStart)} → {formatPoint(candidate.normalizedEnd)}</span>
+                                                <span>px: {formatPoint(candidate.pixelStart, 2)} → {formatPoint(candidate.pixelEnd, 2)}</span>
+                                                <span>Угол: {numberFormatter.format(candidate.angleDifferenceDegrees)}° · расстояние: {numberFormatter.format(candidate.segmentDistancePx)} px</span>
+                                                <span>Перпендикуляр: {candidate.perpendicularDistancePx === null ? "—" : `${numberFormatter.format(candidate.perpendicularDistancePx)} px`}</span>
+                                                <span>Проекция: {candidate.projectedInterval ? `${numberFormatter.format(candidate.projectedInterval.start * 100)}–${numberFormatter.format(candidate.projectedInterval.end * 100)}%` : "нет"}</span>
+                                                <span>Результат: {candidate.rejectionReason}</span>
+                                              </li>
+                                            );
+                                          })}
+                                        </ul>
+                                      </details>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                  <ul className="plan-markup-graph__diagnostics">
+                    {architecturalGraph.diagnostics.length > 0
+                      ? architecturalGraph.diagnostics.map((diagnostic) => <li key={diagnostic.id}>{diagnostic.message}</li>)
+                      : <li>Проблем связности не найдено.</li>}
+                  </ul>
+                </div>
+              )}
+            </section>
           )}
 
           <div className="plan-markup-summary__collections">
