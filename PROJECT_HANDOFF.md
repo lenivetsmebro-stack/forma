@@ -22,7 +22,7 @@ Message:
 
 ## Freeze commit
 
-`TO_BE_FILLED_AFTER_COMMIT`
+`1a6e75601a98786f64f974f63485353c794c1805`
 
 ## Freeze tag
 
@@ -170,11 +170,11 @@ Do not redraw the plan until it is proven that `markup.walls` itself is empty.
 
 ## Backup locations
 
-- Backup directory: `TO_BE_FILLED_AFTER_BACKUP`
-- Git bundle: `TO_BE_FILLED_AFTER_BACKUP`
-- Source archive: `TO_BE_FILLED_AFTER_BACKUP`
-- Checksums: `TO_BE_FILLED_AFTER_BACKUP`
-- Freeze metadata: `TO_BE_FILLED_AFTER_BACKUP`
+- Backup directory: `/Users/cudoudo/Backups/FORMA_freeze_2026-09-07`
+- Git bundle: `/Users/cudoudo/Backups/FORMA_freeze_2026-09-07/forma-freeze-2026-09-07.bundle`
+- Source archive: `/Users/cudoudo/Backups/FORMA_freeze_2026-09-07/forma-source-freeze-2026-09-07.tar.gz`
+- Checksums: `/Users/cudoudo/Backups/FORMA_freeze_2026-09-07/SHA256SUMS.txt`
+- Freeze metadata: `/Users/cudoudo/Backups/FORMA_freeze_2026-09-07/FREEZE_INFO.txt`
 
 ## Restore procedure
 
