@@ -3146,8 +3146,20 @@ button { font: inherit; }
   .guarantees__list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
-@media (min-width: 48rem) {
+.navigation__list { flex-wrap: nowrap; }
+.navigation__link { white-space: nowrap; }
+.site-footer__navigation .navigation__list { flex-wrap: wrap; }
+
+@media (min-width: 48rem) and (max-width: 63.999rem) {
+  .site-header__navigation { display: none; }
+}
+
+@media (min-width: 64rem) {
   .mobile-menu { display: none; }
+  .site-header__navigation .navigation__list { gap: clamp(1rem, 2vw, 2.25rem); }
+}
+
+@media (min-width: 48rem) {
   .service-card { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); column-gap: clamp(2rem, 5vw, 5rem); }
   .service-card__head { grid-row: span 2; }
   .faq .section-intro { margin-bottom: 3rem; }
