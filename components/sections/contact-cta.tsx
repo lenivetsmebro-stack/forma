@@ -11,8 +11,8 @@ export function ContactCta() {
           <div className="contact-cta__aside">
             <p>Обсудим задачу, формат проекта и следующий шаг.</p>
             <div className="contact-cta__actions">
-              <Button href="/planner">Рассчитать стоимость</Button>
-              <Button href="#contacts" variant="secondary">Обсудить проект</Button>
+              <Button href="/calculator">Рассчитать стоимость</Button>
+              <Button href="/contacts" variant="secondary">Оставить заявку</Button>
             </div>
           </div>
         </div>

@@ -27,7 +27,7 @@ export default function Home() {
                 спокойно, последовательно и с вниманием к каждой детали.
               </p>
               <div className="foundation-hero__actions">
-                <Button href="#contacts">Обсудить проект</Button>
+                <Button href="/contacts">Обсудить проект</Button>
                 <Button href="/planner" variant="secondary">
                   Открыть FORMA Planner
                 </Button>

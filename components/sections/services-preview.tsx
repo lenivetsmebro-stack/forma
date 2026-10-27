@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 
 const services = [
@@ -50,6 +51,9 @@ export function ServicesPreview() {
             </li>
           ))}
         </ol>
+        <div className="section-more">
+          <Button href="/services" variant="secondary">Состав услуг и цены</Button>
+        </div>
       </Container>
     </section>
   );

@@ -75,7 +75,13 @@ Message:
 - **STEP 05C.6 — Room Boundary Snapping:** node-first, wall-second, free-point fallback with intrinsic-pixel snapping and draft preview.
 - **STEP 05C.5F — Runtime wall-path diagnosis (started, unresolved):** counters exist for UI walls, connectivity input, function input, normalized source walls, derived segments, nodes, and edges. The failing real browser session has not yet been used to read these counters, so the first zero-wall boundary is not proven.
 
-## Current unresolved issue
+## Update 2026-10-27 — STEP 05C.5F resolved
+
+Root cause: the failing session had rooms but no marked walls (`markup.walls` was empty). The dark lines were the plan image itself. Graph code verified correct; tolerances unchanged. Fix (commit `bb8cb24`): distinct wall colour with halo, empty-walls notice in the connectivity panel, confirmation on "Очистить стены". Browser check: 6 walls, 3/3 rooms linked, 0 problems.
+
+Public site pages added after that: /services, /projects, /projects/[slug], /calculator, /studio, /contacts, sitemap, robots, 404.
+
+## Previously unresolved issue (kept for history)
 
 REAL BROWSER OBSERVATION:
 

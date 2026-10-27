@@ -1,11 +1,7 @@
 import { Container } from "@/components/ui/container";
+import { processSteps } from "@/lib/site-content";
 
-const steps = [
-  { number: "01", title: "Знакомство", description: "Понимаем задачу, контекст пространства и ожидания." },
-  { number: "02", title: "Концепция", description: "Формируем направление, материалы и основные решения." },
-  { number: "03", title: "Реализация", description: "Собираем проект в последовательный рабочий процесс." },
-  { number: "04", title: "Передача", description: "Завершаем работу и передаём готовое пространство." },
-];
+const steps = processSteps;
 
 export function Process() {
   return (

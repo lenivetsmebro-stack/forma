@@ -1,12 +1,6 @@
 import Link from "next/link";
 
-const navigationItems = [
-  { href: "/#services", label: "Услуги" },
-  { href: "/#planner", label: "Planner" },
-  { href: "/#projects", label: "Проекты" },
-  { href: "/#studio", label: "О студии" },
-  { href: "/#contacts", label: "Контакты" },
-];
+import { navigationItems } from "@/lib/site-content";
 
 type NavigationProps = { className?: string; label?: string };
 

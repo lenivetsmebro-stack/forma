@@ -1,3 +1,4 @@
+import { MobileMenu } from "@/components/layout/mobile-menu";
 import { Navigation } from "@/components/layout/navigation";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
@@ -9,9 +10,12 @@ export function Header() {
       <Container className="site-header__inner">
         <Logo />
         <Navigation className="site-header__navigation" />
-        <Button className="site-header__cta" href="#contacts" variant="secondary">
-          Рассчитать стоимость
-        </Button>
+        <div className="site-header__end">
+          <Button className="site-header__cta" href="/calculator" variant="secondary">
+            Рассчитать стоимость
+          </Button>
+          <MobileMenu />
+        </div>
       </Container>
     </header>
   );
