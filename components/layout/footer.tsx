@@ -1,6 +1,7 @@
 import { Navigation } from "@/components/layout/navigation";
 import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/ui/logo";
+import { developer } from "@/lib/site-content";
 
 export function Footer() {
   return (
@@ -16,7 +17,21 @@ export function Footer() {
         />
       </Container>
       <Container className="site-footer__meta">
-        <p>Portfolio / demo project</p>
+        <p>
+          Концепт-проект для портфолио: студия, контакты и кейсы вымышлены.
+          {developer.name && (
+            <>
+              {" "}Дизайн и разработка —{" "}
+              {developer.telegram ? (
+                <a href={`https://t.me/${developer.telegram}`} target="_blank" rel="noopener noreferrer">
+                  {developer.name} · @{developer.telegram}
+                </a>
+              ) : (
+                developer.name
+              )}
+            </>
+          )}
+        </p>
       </Container>
     </footer>
   );

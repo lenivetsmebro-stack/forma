@@ -3219,3 +3219,7 @@ button { font: inherit; }
   overflow-wrap: break-word;
   hyphens: auto;
 }
+
+.site-footer__meta p { text-transform: none; letter-spacing: 0.02em; line-height: 1.6; }
+.site-footer__meta a { color: var(--foreground); border-bottom: 1px solid var(--line); transition: border-color 180ms ease; }
+.site-footer__meta a:hover { border-color: var(--foreground); }

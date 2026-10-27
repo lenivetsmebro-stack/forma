@@ -10,6 +10,12 @@ export const siteConfig = {
   hours: "Пн–Пт, 10:00–19:00",
 };
 
+/** Portfolio credit shown in the footer. Fill in name and Telegram handle (without @). */
+export const developer: { name: string; telegram: string } = {
+  name: "",
+  telegram: "",
+};
+
 export const navigationItems = [
   { href: "/services", label: "Услуги" },
   { href: "/projects", label: "Проекты" },
