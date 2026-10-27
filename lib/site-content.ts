@@ -3,7 +3,7 @@ export const siteConfig = {
   title: "FORMA — ремонт и интерьер",
   description:
     "Студия ремонта квартир и дизайна интерьеров: концепция, рабочий проект, ремонт под ключ и авторский надзор.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://forma-studio.vercel.app",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://forma-mauve-delta.vercel.app",
   city: "Калининград",
   phone: "+7 (900) 000-00-00",
   email: "hello@forma.studio",
