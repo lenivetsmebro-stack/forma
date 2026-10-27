@@ -3202,4 +3202,5 @@ button { font: inherit; }
   .case__shot--main { grid-row: 1 / span 2; aspect-ratio: auto; min-height: 100%; }
   .case__shot:not(.case__shot--main) { aspect-ratio: auto; }
   .project-tile__visual { aspect-ratio: 5 / 4; }
+  .projects__cover { aspect-ratio: auto; height: clamp(12rem, 17vw, 17rem); }
 }
