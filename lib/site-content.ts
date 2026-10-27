@@ -12,8 +12,8 @@ export const siteConfig = {
 
 /** Portfolio credit shown in the footer. Fill in name and Telegram handle (without @). */
 export const developer: { name: string; telegram: string } = {
-  name: "",
-  telegram: "",
+  name: "Даниил Демьяненко",
+  telegram: "kld_demyanenko_daniil",
 };
 
 export const navigationItems = [
