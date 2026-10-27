@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
-import { ProjectPlan } from "@/components/projects/project-plan";
 import { ContactCta } from "@/components/sections/contact-cta";
 import { Container } from "@/components/ui/container";
 import { PageHero } from "@/components/ui/page-hero";
@@ -29,7 +29,15 @@ export default function ProjectsPage() {
               <li key={project.slug}>
                 <Link className="project-tile" href={`/projects/${project.slug}`}>
                   <div className="project-tile__visual">
-                    <ProjectPlan project={project} />
+                    {project.images[0] && (
+                      <Image
+                        src={project.images[0].src}
+                        alt={project.images[0].alt}
+                        width={project.images[0].width}
+                        height={project.images[0].height}
+                        sizes="(min-width: 48rem) 55vw, 100vw"
+                      />
+                    )}
                   </div>
                   <div className="project-tile__body">
                     <p className="projects__type">{project.number} · {project.type}</p>
@@ -46,7 +54,7 @@ export default function ProjectsPage() {
               </li>
             ))}
           </ol>
-          <p className="project-index__note">Концептуальные кейсы портфолио: планировки и цифры приведены для демонстрации подхода.</p>
+          <p className="project-index__note">Концептуальные кейсы портфолио: визуализации, планировки и цифры приведены для демонстрации подхода.</p>
         </Container>
       </section>
       <ContactCta />

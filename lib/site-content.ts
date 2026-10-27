@@ -113,6 +113,13 @@ export const faq = [
   },
 ];
 
+export type ProjectImage = {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+};
+
 export type Project = {
   slug: string;
   number: string;
@@ -129,6 +136,7 @@ export type Project = {
   result: string;
   palette: { name: string; hex: string }[];
   plan: "linear" | "open" | "split";
+  images: ProjectImage[];
 };
 
 export const projects: Project[] = [
@@ -157,6 +165,11 @@ export const projects: Project[] = [
       { name: "Графит", hex: "#3a3a36" },
       { name: "Льняной текстиль", hex: "#d6cdbd" },
     ],
+    images: [
+      { src: "/projects/quiet-apartment-1.jpg", alt: "Кухня-гостиная у окна: светлый известняк, дубовые фасады и льняной диван", width: 900, height: 1024 },
+      { src: "/projects/quiet-apartment-2.jpg", alt: "Коридор со встроенным дубовым хранением и скрытой подсветкой", width: 622, height: 494 },
+      { src: "/projects/quiet-apartment-3.jpg", alt: "Детская с раздвижной стеклянной перегородкой", width: 622, height: 519 },
+    ],
     plan: "linear",
   },
   {
@@ -184,6 +197,11 @@ export const projects: Project[] = [
       { name: "Микроцемент", hex: "#a9a59c" },
       { name: "Белый лён", hex: "#f1ede5" },
     ],
+    images: [
+      { src: "/projects/house-by-the-water-1.jpg", alt: "Общая зона второго света с панорамным остеклением и видом на залив", width: 933, height: 1024 },
+      { src: "/projects/house-by-the-water-2.jpg", alt: "Лестница из термодерева у окна с видом на воду", width: 589, height: 507 },
+      { src: "/projects/house-by-the-water-3.jpg", alt: "Спальня с панорамным окном на залив", width: 589, height: 507 },
+    ],
     plan: "open",
   },
   {
@@ -210,6 +228,11 @@ export const projects: Project[] = [
       { name: "Орех", hex: "#6b4f3a" },
       { name: "Терракота", hex: "#b4532a" },
       { name: "Молочный", hex: "#ece6db" },
+    ],
+    images: [
+      { src: "/projects/city-rhythm-1.jpg", alt: "Студия со стеклянной перегородкой, за которой спальня с видом на вечерний город", width: 931, height: 1024 },
+      { src: "/projects/city-rhythm-2.jpg", alt: "Рабочее место в подоконной зоне с ореховым хранением", width: 591, height: 506 },
+      { src: "/projects/city-rhythm-3.jpg", alt: "Линейная кухня с ореховыми фасадами и скрытой техникой", width: 591, height: 507 },
     ],
     plan: "split",
   },

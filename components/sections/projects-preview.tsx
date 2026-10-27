@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,17 @@ export function ProjectsPreview() {
           {projects.map((project) => (
             <li className="projects__item" key={project.slug}>
               <Link className="projects__link" href={`/projects/${project.slug}`}>
+                {project.images[0] && (
+                  <div className="projects__cover">
+                    <Image
+                      src={project.images[0].src}
+                      alt={project.images[0].alt}
+                      width={project.images[0].width}
+                      height={project.images[0].height}
+                      sizes="(min-width: 48rem) 33vw, 100vw"
+                    />
+                  </div>
+                )}
                 <div className="projects__meta">
                   <span className="item-number" aria-hidden="true">{project.number}</span>
                   <span className="projects__note">{project.area} м² · {project.duration}</span>

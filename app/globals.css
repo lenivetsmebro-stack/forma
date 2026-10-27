@@ -3184,3 +3184,22 @@ button { font: inherit; }
   .site-header__cta { display: none; }
 }
 .case__visual .project-plan { max-width: 46rem; margin-inline: auto; }
+
+/* Project imagery */
+.projects__cover, .project-tile__visual, .case__shot { overflow: hidden; background: var(--subtle); }
+.projects__cover img, .project-tile__visual img, .case__shot img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 600ms ease; }
+.projects__cover { aspect-ratio: 4 / 3; }
+.projects__link:hover .projects__cover img, .project-tile:hover .project-tile__visual img { transform: scale(1.03); }
+.project-tile__visual { padding: 0; aspect-ratio: 4 / 3; border: 0; }
+.case__gallery { display: grid; gap: 0.75rem; }
+.case__shot { margin: 0; }
+.case__shot--main { aspect-ratio: 4 / 3; }
+.case__shot:not(.case__shot--main) { aspect-ratio: 6 / 5; }
+.case__grid .case__visual { margin-top: 1rem; padding: 1rem; }
+.case__grid .case__visual .project-plan { max-width: 26rem; margin-inline: 0; }
+@media (min-width: 48rem) {
+  .case__gallery { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); grid-template-rows: repeat(2, clamp(13rem, 21vw, 22rem)); }
+  .case__shot--main { grid-row: 1 / span 2; aspect-ratio: auto; min-height: 100%; }
+  .case__shot:not(.case__shot--main) { aspect-ratio: auto; }
+  .project-tile__visual { aspect-ratio: 5 / 4; }
+}

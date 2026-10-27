@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -50,8 +51,19 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
             <div><dt>Год</dt><dd>{project.year}</dd></div>
           </dl>
 
-          <div className="case__visual">
-            <ProjectPlan project={project} />
+          <div className="case__gallery">
+            {project.images.map((image, imageIndex) => (
+              <figure key={image.src} className={imageIndex === 0 ? "case__shot case__shot--main" : "case__shot"}>
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  width={image.width}
+                  height={image.height}
+                  priority={imageIndex === 0}
+                  sizes={imageIndex === 0 ? "(min-width: 48rem) 60vw, 100vw" : "(min-width: 48rem) 40vw, 100vw"}
+                />
+              </figure>
+            ))}
           </div>
 
           <div className="case__grid">
@@ -75,6 +87,12 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
                   </li>
                 ))}
               </ul>
+            </section>
+            <section aria-labelledby="case-plan">
+              <p className="section-label" id="case-plan">Планировка</p>
+              <div className="case__visual">
+                <ProjectPlan project={project} />
+              </div>
             </section>
             <section aria-labelledby="case-result">
               <p className="section-label" id="case-result">Результат</p>
