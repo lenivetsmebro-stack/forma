@@ -382,6 +382,18 @@ export function PlanMarkupStep({
     if (selectedOpening?.wallId === wallId) setSelectedOpeningId(null);
   }
 
+  function clearWalls() {
+    if (markup.walls.length === 0) return;
+    const openingsNote = markup.openings.length > 0 ? ` и все проёмы (${markup.openings.length})` : "";
+    const confirmed = window.confirm(
+      `Удалить все стены (${markup.walls.length})${openingsNote}? Помещения останутся, но потеряют связь со стенами.`,
+    );
+    if (!confirmed) return;
+    onMarkupChange({ ...markup, walls: [], openings: [] });
+    setDraftWallStart(null);
+    setSelectedOpeningId(null);
+  }
+
   function removeRoom(roomId: string) {
     onMarkupChange({ ...markup, rooms: markup.rooms.filter((room) => room.id !== roomId) });
   }
@@ -497,7 +509,8 @@ export function PlanMarkupStep({
                 </g>
                 {markup.walls.map((wall) => (
                   <g key={wall.id} className="plan-markup__wall">
-                    <line x1={x(wall.start)} y1={y(wall.start)} x2={x(wall.end)} y2={y(wall.end)} />
+                    <line className="plan-markup__wall-halo" x1={x(wall.start)} y1={y(wall.start)} x2={x(wall.end)} y2={y(wall.end)} />
+                    <line className="plan-markup__wall-line" x1={x(wall.start)} y1={y(wall.start)} x2={x(wall.end)} y2={y(wall.end)} />
                     <circle cx={x(wall.start)} cy={y(wall.start)} r={markerRadius * 0.65} />
                     <circle cx={x(wall.end)} cy={y(wall.end)} r={markerRadius * 0.65} />
                   </g>
@@ -676,7 +689,7 @@ export function PlanMarkupStep({
               <p>{draftWallStart ? "Выберите конечную точку стены." : "Выберите начальную точку стены."}</p>
               <button className="button button--secondary" type="button" disabled={!draftWallStart} onClick={() => setDraftWallStart(null)}>Отменить точку стены</button>
               <button className="button button--secondary" type="button" disabled={markup.walls.length === 0} onClick={() => { const wall = markup.walls.at(-1); if (wall) removeWall(wall.id); }}>Удалить последнюю стену</button>
-              <button className="button button--secondary" type="button" disabled={markup.walls.length === 0} onClick={() => { onMarkupChange({ ...markup, walls: [], openings: [] }); setDraftWallStart(null); setSelectedOpeningId(null); }}>Очистить стены</button>
+              <button className="button button--secondary" type="button" disabled={markup.walls.length === 0} onClick={clearWalls}>Очистить стены</button>
               <button className="plan-markup__reset-scale" type="button" onClick={resetCalibration}>Сбросить масштаб</button>
             </div>
           ) : markupMode === "rooms" ? (
@@ -773,6 +786,18 @@ export function PlanMarkupStep({
                 <div><dt>Помещений связано</dt><dd>{linkedRoomCount} / {markup.rooms.length}</dd></div>
                 <div><dt>Проблем</dt><dd>{architecturalGraph.diagnostics.length}</dd></div>
               </dl>
+              {markup.walls.length === 0 && markup.rooms.length > 0 && (
+                <div className="plan-markup-graph__notice" role="status">
+                  <strong>Стены не размечены</strong>
+                  <p>
+                    Связность строится только по стенам, отмеченным в режиме «Стены».
+                    Линии самого чертежа не учитываются, поэтому помещения пока не к чему привязать.
+                  </p>
+                  {calibration && markupMode !== "walls" && (
+                    <button type="button" onClick={() => selectMarkupMode("walls")}>Разметить стены</button>
+                  )}
+                </div>
+              )}
               {showGraphDiagnostics && (
                 <div className="plan-markup-graph__details">
                   <section className="plan-markup-graph__runtime-proof" aria-label="Проверка передачи стен">

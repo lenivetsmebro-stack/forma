@@ -9,6 +9,7 @@
   --line: #cbc5ba;
   --accent: #a58d70;
   --accent-strong: #887158;
+  --markup-wall: #b4532a;
   --radius: 0.25rem;
   --container: 90rem;
   --page-padding: clamp(1.25rem, 4vw, 4.5rem);
@@ -801,7 +802,6 @@ button { font: inherit; }
   touch-action: none;
 }
 
-.plan-markup__wall line,
 .plan-markup__calibration-line {
   fill: none;
   stroke: var(--foreground);
@@ -809,9 +809,14 @@ button { font: inherit; }
   vector-effect: non-scaling-stroke;
 }
 
+/* Marked walls use a dedicated colour with a light halo so they never blend into the printed plan lines. */
+.plan-markup__wall line { fill: none; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.plan-markup__wall-halo { stroke: var(--surface); stroke-width: 7; opacity: 0.9; }
+.plan-markup__wall-line { stroke: var(--markup-wall); stroke-width: 3.5; }
+
 .plan-markup__wall circle {
   fill: var(--surface);
-  stroke: var(--foreground);
+  stroke: var(--markup-wall);
   stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
 }
@@ -1045,6 +1050,11 @@ button { font: inherit; }
 .plan-markup-graph dl > div { display: block; min-width: 0; padding: 0.65rem 0.5rem 0.65rem 0; border-top: 0; }
 .plan-markup-graph dl > div:nth-child(even) { padding-inline: 0.5rem 0; border-left: 1px solid var(--line); }
 .plan-markup-graph dl dd { margin-top: 0.25rem; text-align: left; }
+.plan-markup-graph__notice { display: grid; gap: 0.5rem; margin-top: 1rem; padding: 0.85rem; border: 1px solid var(--markup-wall); border-left-width: 3px; background: color-mix(in srgb, var(--markup-wall) 6%, transparent); }
+.plan-markup-graph__notice strong { color: var(--markup-wall); font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.plan-markup-graph__notice p { margin: 0; color: var(--foreground); font-size: 0.8125rem; line-height: 1.5; }
+.plan-markup-graph__notice button { justify-self: start; min-height: 2.75rem; padding-inline: 1rem; border: 1px solid var(--markup-wall); background: transparent; color: var(--markup-wall); cursor: pointer; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.plan-markup-graph__notice button:hover { background: var(--markup-wall); color: var(--surface); }
 .plan-markup-graph__details { display: grid; gap: 1rem; margin-top: 1rem; }
 .plan-markup-graph__runtime-proof { display: grid; gap: 0.2rem; border: 1px solid var(--line); padding: 0.65rem; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.625rem; overflow-wrap: anywhere; }
 .plan-markup-graph__runtime-proof strong { margin-bottom: 0.2rem; color: var(--foreground); font-family: Arial, Helvetica, sans-serif; font-size: 0.6875rem; text-transform: uppercase; }
