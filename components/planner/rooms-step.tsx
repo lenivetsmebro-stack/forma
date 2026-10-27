@@ -2,6 +2,7 @@ import type { PlannerObjectData, PlannerRoom } from "@/components/planner/types"
 import {
   calculateRoomsTotalArea,
   isAreaMatched,
+  isAreaWithinLimit,
   isRoomValid,
 } from "@/components/planner/planner-utils";
 import { RoomCard } from "@/components/planner/room-card";
@@ -27,13 +28,17 @@ export function RoomsStep({
   const roomCountMatched = rooms.length === objectData.roomCount;
   const roomsTotalArea = calculateRoomsTotalArea(rooms);
   const areaMatched = isAreaMatched(objectData.totalArea ?? 0, roomsTotalArea);
-  const plannerReady = allRoomsValid && roomCountMatched && areaMatched;
+  const areaWithinLimit = isAreaWithinLimit(objectData.totalArea ?? 0, roomsTotalArea);
+  const plannerReady = allRoomsValid && roomCountMatched && areaWithinLimit;
+  const unassignedArea = Math.max(0, (objectData.totalArea ?? 0) - roomsTotalArea);
   const readinessMessage = !allRoomsValid
-    ? "Заполните параметры всех помещений"
+    ? "Заполните тип, длину, ширину и высоту всех помещений"
     : !roomCountMatched
       ? "Синхронизируйте количество помещений с параметрами объекта"
+    : !areaWithinLimit
+      ? "Площадь помещений больше площади объекта — проверьте размеры"
     : !areaMatched
-      ? "Согласуйте площадь помещений с площадью объекта"
+      ? `Данные готовы. Не распределено ${new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 }).format(unassignedArea)} м² — это могут быть стены и коридоры.`
       : "Данные готовы к этапу материалов";
 
   return (

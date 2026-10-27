@@ -6,7 +6,7 @@ import { ImportStep } from "@/components/planner/import-step";
 import { ObjectStep } from "@/components/planner/object-step";
 import { MaterialsStep } from "@/components/planner/materials-step";
 import { createDefaultRoomFinishes } from "@/components/planner/material-utils";
-import { PlannerProgress } from "@/components/planner/planner-progress";
+import { PlannerProgress, type PlannerStepNumber } from "@/components/planner/planner-progress";
 import {
   PlannerEntryModeControl,
   type PlannerEntryMode,
@@ -37,7 +37,7 @@ const initialDesignData: PlannerDesignData = {
 };
 
 export function PlannerShell() {
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4 | 5>(1);
+  const [currentStep, setCurrentStep] = useState<PlannerStepNumber>(1);
   const [entryMode, setEntryMode] = useState<PlannerEntryMode>("manual");
   const [data, setData] = useState<PlannerObjectData>(initialData);
   const [rooms, setRooms] = useState<PlannerRoom[]>([]);
@@ -161,7 +161,7 @@ export function PlannerShell() {
         </p>
       </header>
 
-      <PlannerProgress currentStep={currentStep} />
+      <PlannerProgress currentStep={currentStep} onStepSelect={setCurrentStep} />
 
       {currentStep === 1 ? (
         <>

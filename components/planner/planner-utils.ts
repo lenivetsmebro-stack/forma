@@ -140,6 +140,17 @@ export function isAreaMatched(
   return Math.abs(calculateAreaDifference(objectArea, roomsTotalArea)) <= AREA_TOLERANCE;
 }
 
+/** Rooms may sum to less than the object area (walls, corridors, unlisted
+ * spaces), but must not exceed it by more than this share. */
+export const AREA_OVERFLOW_LIMIT = 0.03;
+
+export function isAreaWithinLimit(objectArea: number, roomsTotalArea: number): boolean {
+  if (!Number.isFinite(objectArea) || !Number.isFinite(roomsTotalArea) || objectArea <= 0 || roomsTotalArea <= 0) {
+    return false;
+  }
+  return roomsTotalArea <= objectArea * (1 + AREA_OVERFLOW_LIMIT) + AREA_TOLERANCE;
+}
+
 export function calculateAreaCompletionPercent(
   objectArea: number,
   roomsTotalArea: number,

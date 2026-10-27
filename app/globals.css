@@ -3204,3 +3204,18 @@ button { font: inherit; }
   .project-tile__visual { aspect-ratio: 5 / 4; }
   .projects__cover { aspect-ratio: auto; height: clamp(12rem, 17vw, 17rem); }
 }
+
+/* Planner: clickable completed steps */
+.planner-progress li > button {
+  display: flex; width: calc(100% + 1.5rem); min-height: calc(100% + 1.5rem); margin: -0.75rem; padding: 0.75rem;
+  flex-direction: column; justify-content: space-between; border: 0; background: transparent; color: inherit;
+  font: inherit; letter-spacing: inherit; text-align: left; text-transform: inherit; cursor: pointer;
+}
+.planner-progress li.is-complete:hover { background: var(--line); }
+
+/* Planner: sidebar headings fit narrow summary panels */
+.object-summary h2, .rooms-summary h2, .materials-summary h2, .style-summary h2, .import-summary h2, .plan-markup-summary h2 {
+  font-size: clamp(1.75rem, 2.4vw, 2.5rem);
+  overflow-wrap: break-word;
+  hyphens: auto;
+}

@@ -7,9 +7,14 @@ const plannerSteps = [
   { number: "06", label: "Расчёт" },
 ];
 
-type PlannerProgressProps = { currentStep: 1 | 2 | 3 | 4 | 5 };
+export type PlannerStepNumber = 1 | 2 | 3 | 4 | 5;
 
-export function PlannerProgress({ currentStep }: PlannerProgressProps) {
+type PlannerProgressProps = {
+  currentStep: PlannerStepNumber;
+  onStepSelect?: (step: PlannerStepNumber) => void;
+};
+
+export function PlannerProgress({ currentStep, onStepSelect }: PlannerProgressProps) {
   return (
     <nav className="planner-progress" aria-label="Этапы FORMA Planner">
       <ol>
@@ -17,20 +22,32 @@ export function PlannerProgress({ currentStep }: PlannerProgressProps) {
           const stepNumber = index + 1;
           const active = stepNumber === currentStep;
           const complete = stepNumber < currentStep;
+          const content = (
+            <>
+              <span aria-hidden="true">{step.number}</span>
+              <span>{step.label}</span>
+              {active && <span className="sr-only"> — текущий этап</span>}
+              {complete && <span className="sr-only"> — завершён, вернуться</span>}
+            </>
+          );
           return (
             <li
               className={active ? "is-active" : complete ? "is-complete" : undefined}
               key={step.number}
+              aria-current={active ? "step" : undefined}
             >
-              <span aria-hidden="true">{step.number}</span>
-              <span>{step.label}</span>
-              {active && <span className="sr-only"> — текущий этап</span>}
-              {complete && <span className="sr-only"> — завершён</span>}
+              {complete && onStepSelect ? (
+                <button type="button" onClick={() => onStepSelect(stepNumber as PlannerStepNumber)}>
+                  {content}
+                </button>
+              ) : (
+                content
+              )}
             </li>
           );
         })}
       </ol>
-      <p>Этап 06 будет доступен позже</p>
+      <p>Следующие этапы откроются по мере заполнения. К пройденным можно вернуться, нажав на них.</p>
     </nav>
   );
 }
