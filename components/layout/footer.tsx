@@ -27,14 +27,21 @@ export function Footer() {
               ) : (
                 developer.name
               )}
-              {developer.telegram && (
+              {developer.bot ? (
+                <>
+                  {" · "}
+                  <a href={`https://t.me/${developer.bot}?start=forma`} target="_blank" rel="noopener noreferrer">
+                    Заказать такой сайт
+                  </a>
+                </>
+              ) : developer.telegram ? (
                 <>
                   {" · "}
                   <a href={`https://t.me/${developer.telegram}`} target="_blank" rel="noopener noreferrer">
                     @{developer.telegram}
                   </a>
                 </>
-              )}
+              ) : null}
             </>
           )}
         </p>

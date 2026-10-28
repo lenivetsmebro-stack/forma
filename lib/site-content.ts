@@ -10,10 +10,11 @@ export const siteConfig = {
   hours: "Пн–Пт, 10:00–19:00",
 };
 
-/** Portfolio credit shown in the footer. Fill in name and Telegram handle (without @). */
-export const developer: { name: string; telegram: string; site: string } = {
+/** Portfolio credit shown in the footer. `bot` is the brief bot username (without @); `telegram` is the fallback. */
+export const developer: { name: string; telegram: string; bot: string; site: string } = {
   name: "Даниил Демьяненко",
   telegram: "kld_demyanenko_daniil",
+  bot: "blaze39_web_bot",
   site: "https://daniil-demyanenko.vercel.app",
 };
 
