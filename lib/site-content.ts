@@ -11,9 +11,10 @@ export const siteConfig = {
 };
 
 /** Portfolio credit shown in the footer. Fill in name and Telegram handle (without @). */
-export const developer: { name: string; telegram: string } = {
+export const developer: { name: string; telegram: string; site: string } = {
   name: "Даниил Демьяненко",
   telegram: "kld_demyanenko_daniil",
+  site: "https://daniil-demyanenko.vercel.app",
 };
 
 export const navigationItems = [

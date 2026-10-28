@@ -22,12 +22,18 @@ export function Footer() {
           {developer.name && (
             <>
               {" "}Дизайн и разработка —{" "}
-              {developer.telegram ? (
-                <a href={`https://t.me/${developer.telegram}`} target="_blank" rel="noopener noreferrer">
-                  {developer.name} · @{developer.telegram}
-                </a>
+              {developer.site ? (
+                <a href={developer.site} target="_blank" rel="noopener noreferrer">{developer.name}</a>
               ) : (
                 developer.name
+              )}
+              {developer.telegram && (
+                <>
+                  {" · "}
+                  <a href={`https://t.me/${developer.telegram}`} target="_blank" rel="noopener noreferrer">
+                    @{developer.telegram}
+                  </a>
+                </>
               )}
             </>
           )}
