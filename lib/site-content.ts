@@ -14,7 +14,7 @@ export const siteConfig = {
 export const developer: { name: string; telegram: string; bot: string; site: string } = {
   name: "Даниил Демьяненко",
   telegram: "kld_demyanenko_daniil",
-  bot: "blaze39_web_bot",
+  bot: "kenigcode_bot",
   site: "https://daniil-demyanenko.vercel.app",
 };
 
