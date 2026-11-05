@@ -3223,3 +3223,63 @@ button { font: inherit; }
 .site-footer__meta p { text-transform: none; letter-spacing: 0.02em; line-height: 1.6; }
 .site-footer__meta a { color: var(--foreground); border-bottom: 1px solid var(--line); transition: border-color 180ms ease; }
 .site-footer__meta a:hover { border-color: var(--foreground); }
+
+/* ---------- Renovation scroll: from concrete to keys ---------- */
+.reno-scroll { position: relative; background: #1d1c19; color: #f6f3ec; }
+.reno-scroll__sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+.reno-scroll__frames, .reno-scroll__frames picture { position: absolute; inset: 0; }
+.reno-scroll__img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; will-change: opacity, transform; transform-origin: 50% 55%;
+}
+.reno-scroll__shade {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg, rgba(20,19,16,.72) 0%, rgba(20,19,16,.35) 38%, rgba(20,19,16,0) 62%),
+    linear-gradient(0deg, rgba(20,19,16,.75) 0%, rgba(20,19,16,0) 34%);
+}
+.reno-scroll__ui {
+  position: relative; z-index: 1; height: 100%;
+  display: grid; grid-template-rows: auto 1fr auto;
+  padding: clamp(1.25rem, 4vw, 4.5rem) var(--page-padding) clamp(1.5rem, 4vw, 3rem);
+}
+.reno-scroll__eyebrow {
+  display: flex; gap: 1rem; justify-content: space-between; margin: 0;
+  font-size: .75rem; letter-spacing: .18em; text-transform: uppercase; color: rgba(246,243,236,.8);
+}
+.reno-scroll__eyebrow span { color: rgba(246,243,236,.55); }
+.reno-scroll__caption { position: relative; align-self: center; max-width: 34rem; min-height: 16rem; }
+.reno-scroll__step {
+  position: absolute; inset: 0 auto auto 0;
+  opacity: 0; transform: translateY(1.25rem);
+  transition: opacity .5s ease, transform .5s ease; pointer-events: none;
+}
+.reno-scroll__step[data-active] { opacity: 1; transform: none; }
+.reno-scroll__num { font-size: .8125rem; letter-spacing: .2em; color: var(--accent); }
+.reno-scroll__step h2 {
+  margin: .5rem 0 1rem; font-family: Georgia, "Times New Roman", serif; font-weight: 400;
+  font-size: clamp(2.25rem, 6vw, 5rem); line-height: 1; letter-spacing: -.035em;
+}
+.reno-scroll__step p { margin: 0; max-width: 28rem; font-size: clamp(.95rem, 1.4vw, 1.0625rem); line-height: 1.65; color: rgba(246,243,236,.85); }
+.reno-scroll__bottom { display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: end; justify-content: space-between; }
+.reno-scroll__track { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; margin: 0; padding: 0; list-style: none; font-size: .8125rem; color: rgba(246,243,236,.45); }
+.reno-scroll__track li { transition: color .4s ease; }
+.reno-scroll__track li[data-done] { color: #f6f3ec; }
+.reno-scroll__track span { color: var(--accent); margin-right: .25rem; }
+.reno-scroll__cta { opacity: 0; transform: translateY(.75rem); transition: opacity .5s ease, transform .5s ease; pointer-events: none; }
+.reno-scroll__cta[data-visible] { opacity: 1; transform: none; pointer-events: auto; }
+.reno-scroll__bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(246,243,236,.15); }
+.reno-scroll__bar span { display: block; height: 100%; background: var(--accent); transform-origin: 0 50%; }
+
+@media (max-width: 47.999rem) {
+  .reno-scroll__shade { background: linear-gradient(0deg, rgba(20,19,16,.88) 0%, rgba(20,19,16,.35) 50%, rgba(20,19,16,.05) 100%); }
+  .reno-scroll__caption { align-self: end; min-height: 15rem; margin-bottom: 1rem; }
+  .reno-scroll__track { display: none; }
+  .reno-scroll__cta .button { width: 100%; }
+  .reno-scroll__cta { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reno-scroll__img { transform: none !important; }
+  .reno-scroll__step, .reno-scroll__cta { transition: none; }
+}

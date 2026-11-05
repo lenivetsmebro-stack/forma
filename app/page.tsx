@@ -3,6 +3,7 @@ import { Container } from "@/components/ui/container";
 import { ContactCta } from "@/components/sections/contact-cta";
 import { PlannerPreview } from "@/components/sections/planner-preview";
 import { Process } from "@/components/sections/process";
+import { RenovationScroll } from "@/components/sections/renovation-scroll";
 import { ProjectsPreview } from "@/components/sections/projects-preview";
 import { ServicesPreview } from "@/components/sections/services-preview";
 import { StudioPreview } from "@/components/sections/studio-preview";
@@ -36,6 +37,7 @@ export default function Home() {
           </div>
         </Container>
       </section>
+      <RenovationScroll />
       <ServicesPreview />
       <PlannerPreview />
       <ProjectsPreview />
