@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description: siteConfig.description,
   },
   twitter: { card: "summary_large_image" },
-  verification: { yandex: "9f1848958246a6f2" },
+  robots: { index: false, follow: true },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
