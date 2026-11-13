@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LUMA — студия красоты · онлайн-запись</title>
+  <meta name="description" content="Стрижки и окрашивание, маникюр, брови и ресницы, уход за лицом. Запишитесь онлайн за минуту: выберите услугу, мастера и удобное время.">
+  <link rel="canonical" href="https://luma-studio-roan.vercel.app/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:url" content="https://luma-studio-roan.vercel.app/">
+  <meta property="og:title" content="LUMA — студия красоты">
+  <meta property="og:description" content="Онлайн-запись к мастеру за минуту.">
+  <meta property="og:image" content="https://luma-studio-roan.vercel.app/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#f7f1ec">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23c4877a'/%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' dominant-baseline='middle' font-family='Georgia' font-size='34' fill='%23fff'%3EL%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">К содержанию</a>
+
+  <header class="header">
+    <div class="wrap header__inner">
+      <a class="logo" href="#top" aria-label="LUMA — наверх">LUMA<span>studio</span></a>
+      <nav class="nav" aria-label="Основная навигация">
+        <a href="#services">Услуги и цены</a>
+        <a href="#masters">Мастера</a>
+        <a href="#gift">Сертификаты</a>
+        <a href="#contacts">Контакты</a>
+      </nav>
+      <a class="btn btn--small" href="#booking">Записаться</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="wrap hero__inner">
+        <div class="hero__text">
+          <p class="kicker">Студия красоты · Калининград</p>
+          <h1 id="hero-title">Время для&nbsp;себя — <em>без звонков и&nbsp;ожидания</em></h1>
+          <p class="hero__lead">Стрижки и окрашивание, маникюр, брови и ресницы, уход за лицом. Выберите услугу, мастера и свободное время — запись займёт меньше минуты.</p>
+          <div class="hero__actions">
+            <a class="btn" href="#booking">Записаться онлайн</a>
+            <a class="btn btn--ghost" href="#services">Смотреть цены</a>
+          </div>
+          <ul class="hero__facts">
+            <li><strong>Ежедневно</strong><span>10:00–21:00</span></li>
+            <li><strong>6 мастеров</strong><span>стаж от 5 лет</span></li>
+            <li><strong>Стерильно</strong><span>сухожар и крафт-пакеты</span></li>
+          </ul>
+        </div>
+        <div class="hero__art" aria-hidden="true">
+          <span class="blob blob--a"></span>
+          <span class="blob blob--b"></span>
+          <span class="blob blob--c"></span>
+          <div class="hero__card">
+            <p class="hero__card-label">Ближайшее окно</p>
+            <p class="hero__card-time" id="nearest-slot">Сегодня, 16:30</p>
+            <p class="hero__card-note">Маникюр с покрытием · Анна</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="services" aria-labelledby="services-title">
+      <div class="wrap">
+        <div class="section__head">
+          <p class="kicker">Услуги и цены</p>
+          <h2 id="services-title">Всё для ухода — в&nbsp;одном месте</h2>
+        </div>
+        <div class="tabs" role="tablist" aria-label="Категории услуг" id="service-tabs"></div>
+        <div class="price-list" id="price-list" role="tabpanel" aria-live="polite"></div>
+        <p class="note">Цена зависит от длины волос и сложности работы — мастер уточнит её до начала.</p>
+      </div>
+    </section>
+
+    <section class="section section--tint" id="booking" aria-labelledby="booking-title">
+      <div class="wrap">
+        <div class="section__head">
+          <p class="kicker">Онлайн-запись</p>
+          <h2 id="booking-title">Запишитесь за&nbsp;минуту</h2>
+        </div>
+        <div class="booking" id="booking-app">
+          <ol class="booking__steps" aria-label="Шаги записи">
+            <li data-step="1" class="is-active"><span>1</span>Услуга</li>
+            <li data-step="2"><span>2</span>Мастер</li>
+            <li data-step="3"><span>3</span>Время</li>
+            <li data-step="4"><span>4</span>Контакты</li>
+          </ol>
+          <div class="booking__body">
+            <div class="booking__panel" id="booking-panel" aria-live="polite"></div>
+            <aside class="booking__summary" aria-label="Ваша запись">
+              <p class="kicker">Ваша запись</p>
+              <dl id="booking-summary">
+                <div><dt>Услуга</dt><dd data-field="service">—</dd></div>
+                <div><dt>Мастер</dt><dd data-field="master">—</dd></div>
+                <div><dt>Дата и время</dt><dd data-field="time">—</dd></div>
+                <div><dt>Длительность</dt><dd data-field="duration">—</dd></div>
+              </dl>
+              <p class="booking__total"><span>Стоимость</span><strong data-field="price">—</strong></p>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="masters" aria-labelledby="masters-title">
+      <div class="wrap">
+        <div class="section__head">
+          <p class="kicker">Мастера</p>
+          <h2 id="masters-title">Команда, к&nbsp;которой возвращаются</h2>
+        </div>
+        <ul class="masters" id="masters-list"></ul>
+      </div>
+    </section>
+
+    <section class="section section--tint" id="gift" aria-labelledby="gift-title">
+      <div class="wrap gift">
+        <div>
+          <p class="kicker">Подарочные сертификаты</p>
+          <h2 id="gift-title">Лучший подарок — время для&nbsp;себя</h2>
+          <p class="gift__text">Сертификат на сумму или конкретную услугу. Действует 6 месяцев, оформляется за 5 минут — в студии или онлайн.</p>
+          <a class="btn" href="#contacts">Заказать сертификат</a>
+        </div>
+        <div class="gift__card" aria-hidden="true">
+          <span class="gift__brand">LUMA</span>
+          <span class="gift__sum">5 000 ₽</span>
+          <span class="gift__label">Подарочный сертификат</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq" aria-labelledby="faq-title">
+      <div class="wrap">
+        <div class="section__head">
+          <p class="kicker">Вопросы</p>
+          <h2 id="faq-title">Перед первым визитом</h2>
+        </div>
+        <div class="faq">
+          <details><summary>Можно перенести или отменить запись?</summary><p>Да, бесплатно — не позднее чем за 3 часа до визита. Напишите нам в Telegram или позвоните.</p></details>
+          <details><summary>Как вы стерилизуете инструменты?</summary><p>Трёхэтапная обработка: дезинфекция, ультразвуковая очистка и сухожар. Крафт-пакет вскрываем при вас.</p></details>
+          <details><summary>На каких материалах работаете?</summary><p>Профессиональные бренды для волос и ногтей, гипоаллергенные пигменты для бровей. Список — у администратора.</p></details>
+          <details><summary>Есть парковка?</summary><p>Бесплатная парковка во дворе для клиентов студии.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="contacts" id="contacts" aria-labelledby="contacts-title">
+      <div class="wrap contacts__inner">
+        <div>
+          <p class="kicker">Контакты</p>
+          <h2 id="contacts-title">Ждём вас в&nbsp;студии</h2>
+          <dl class="contacts__list">
+            <div><dt>Адрес</dt><dd>Калининград, ул. Примерная, 1</dd></div>
+            <div><dt>Часы</dt><dd>Ежедневно, 10:00–21:00</dd></div>
+            <div><dt>Телефон</dt><dd>+7 (900) 000-00-00</dd></div>
+          </dl>
+          <a class="btn" href="#booking">Записаться онлайн</a>
+        </div>
+        <div class="map" aria-hidden="true">
+          <span class="map__road map__road--h"></span>
+          <span class="map__road map__road--v"></span>
+          <span class="map__pin">LUMA</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <p>Концепт-проект для портфолио: студия, адрес, мастера и цены вымышлены, запись не отправляется.</p>
+      <p>Дизайн и разработка — <a href="https://daniil-demyanenko.vercel.app" target="_blank" rel="noopener noreferrer">Даниил Демьяненко</a> · <a href="https://t.me/kenigcode_bot?start=luma" target="_blank" rel="noopener noreferrer">Заказать такой сайт</a> · <a href="privacy.html">Политика конфиденциальности</a></p>
+    </div>
+  </footer>
+
+  <script src="app.js" defer></script>
+</body>
+</html>

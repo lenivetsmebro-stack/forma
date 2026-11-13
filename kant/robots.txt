@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kant-store-demo.vercel.app/sitemap.xml
