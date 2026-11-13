@@ -3283,3 +3283,13 @@ button { font: inherit; }
   .reno-scroll__img { transform: none !important; }
   .reno-scroll__step, .reno-scroll__cta { transition: none; }
 }
+
+/* Legal pages: privacy policy and consent */
+.legal-page { padding-block: clamp(3rem, 8vw, 7rem); }
+.legal-page__inner { max-width: 46rem; }
+.legal-page h1 { font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; margin: 0 0 2rem; }
+.legal-page h2 { font-size: 1.25rem; margin: 2.5rem 0 0.75rem; }
+.legal-page p, .legal-page li { color: var(--muted); line-height: 1.7; }
+.legal-page p { margin: 0 0 1rem; }
+.legal-page ul { margin: 0 0 1rem; padding-left: 1.25rem; list-style: disc; }
+.legal-page a, .contact-form__consent a { color: var(--foreground); text-decoration: underline; text-underline-offset: 3px; }

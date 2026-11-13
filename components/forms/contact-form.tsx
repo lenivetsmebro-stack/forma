@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useId, useState } from "react";
 import type { FormEvent } from "react";
 
@@ -106,7 +107,7 @@ export function ContactForm({ initialMessage = "" }: ContactFormProps) {
             aria-describedby={errors.consent ? `${id}-consent-error` : undefined}
             onChange={(event) => setConsent(event.target.checked)}
           />
-          <span>Согласен на обработку персональных данных для ответа на заявку</span>
+          <span>Даю <Link href="/consent" target="_blank">согласие на обработку персональных данных</Link> на условиях <Link href="/privacy" target="_blank">политики конфиденциальности</Link></span>
         </label>
         {errors.consent && <p className="field-error" id={`${id}-consent-error`}>{errors.consent}</p>}
       </div>

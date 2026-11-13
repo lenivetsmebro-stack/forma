@@ -18,6 +18,8 @@ export function Footer() {
       </Container>
       <Container className="site-footer__meta">
         <p>
+          <a href="/privacy">Политика обработки персональных данных</a>
+          {" · "}
           Концепт-проект для портфолио: студия, контакты и кейсы вымышлены.
           {developer.name && (
             <>
