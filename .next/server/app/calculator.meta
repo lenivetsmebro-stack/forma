@@ -1,0 +1,34 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/calculator/layout,_N_T_/calculator/page,_N_T_/calculator"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/calculator/__PAGE__"
+  ],
+  "prefetchHints": {
+    "hints": 64,
+    "slots": {
+      "children": {
+        "hints": 96,
+        "slots": {
+          "children": {
+            "hints": 160,
+            "slots": null
+          }
+        }
+      }
+    }
+  },
+  "routeCache": {
+    "key": "/route-cache/APP_PAGE/a2ba2a246ead5f709a5a53335db2bbae7ab54032ae991f35e3282d25fb46638c/$/calculator",
+    "owner": {
+      "kind": "APP_PAGE",
+      "sourceRoute": "/calculator/page"
+    },
+    "isFallback": false
+  }
+}

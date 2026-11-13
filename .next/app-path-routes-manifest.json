@@ -1,0 +1,18 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/calculator/page": "/calculator",
+  "/consent/page": "/consent",
+  "/contacts/page": "/contacts",
+  "/favicon.ico/route": "/favicon.ico",
+  "/opengraph-image.jpg/route": "/opengraph-image.jpg",
+  "/page": "/",
+  "/planner/page": "/planner",
+  "/privacy/page": "/privacy",
+  "/projects/[slug]/page": "/projects/[slug]",
+  "/projects/page": "/projects",
+  "/robots.txt/route": "/robots.txt",
+  "/services/page": "/services",
+  "/sitemap.xml/route": "/sitemap.xml",
+  "/studio/page": "/studio"
+}

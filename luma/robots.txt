@@ -1,4 +1,2 @@
 User-agent: *
 Allow: /
-
-Sitemap: https://luma-studio-roan.vercel.app/sitemap.xml

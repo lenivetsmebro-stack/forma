@@ -1,0 +1,18 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/calculator/page": "app/calculator/page.js",
+  "/consent/page": "app/consent/page.js",
+  "/contacts/page": "app/contacts/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/opengraph-image.jpg/route": "app/opengraph-image.jpg/route.js",
+  "/page": "app/page.js",
+  "/planner/page": "app/planner/page.js",
+  "/privacy/page": "app/privacy/page.js",
+  "/projects/[slug]/page": "app/projects/[slug]/page.js",
+  "/projects/page": "app/projects/page.js",
+  "/robots.txt/route": "app/robots.txt/route.js",
+  "/services/page": "app/services/page.js",
+  "/sitemap.xml/route": "app/sitemap.xml/route.js",
+  "/studio/page": "app/studio/page.js"
+}
