@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, follow">
+<meta name="description" content="Garten — салон красоты в Калининграде. Сложное окрашивание и SPA-уход для кожи головы.">
+<meta name="theme-color" content="#13110f">
+<title>Garten — концепт сайта салона красоты</title>
+<link rel="canonical" href="https://daniil-demyanenko.vercel.app/garten/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://daniil-demyanenko.vercel.app/garten/">
+<meta property="og:title" content="Garten — концепт сайта салона красоты">
+<meta property="og:description" content="Демо студии «Кёниг Код». Салон красоты, окрашивание, SPA и онлайн-запись.">
+<meta property="og:image" content="https://daniil-demyanenko.vercel.app/garten/hair.webp">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #13110f;
+    --panel: #1c1713;
+    --line: #3d3128;
+    --ink: #f8f0e5;
+    --muted: #c7b7a6;
+    --gold: #ddbc91;
+    --serif: Georgia, "Times New Roman", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 82px; }
+  body { margin: 0; color: var(--ink); background: var(--bg); font: 16px/1.55 var(--sans); }
+  img { display: block; width: 100%; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 5px; }
+  .wrap { width: min(1200px, 100% - 100px); margin-inline: auto; }
+  .eyebrow { color: var(--gold); font-size: .69rem; font-weight: 650; letter-spacing: .2em; text-transform: uppercase; }
+  .header { position: sticky; top: 0; z-index: 3; background: #13110feb; backdrop-filter: blur(16px); border-bottom: 1px solid #3d3128b3; }
+  .header .wrap { height: 74px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; }
+  .wordmark { width: fit-content; font: 400 1.66rem/1 var(--serif); letter-spacing: .19em; }
+  nav { display: flex; gap: clamp(20px, 4vw, 52px); font-size: .86rem; color: var(--muted); }
+  nav a:hover, .text-link:hover { color: var(--ink); }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+  .button {
+    display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+    width: fit-content; min-height: 50px; padding: 0 23px; border-radius: 99px;
+    background: var(--gold); border: 1px solid transparent; color: #24170e;
+    font-size: .86rem; font-weight: 700; cursor: pointer;
+  }
+  .button:hover { background: #ebcda8; }
+  .button-outline { border-color: #8e7662; background: transparent; color: var(--ink); }
+  .button-outline:hover { border-color: var(--gold); background: #ddbc9117; }
+  .button-small { min-height: 42px; padding-inline: 17px; font-size: .8rem; }
+  .header .button { justify-self: end; }
+  .arrow { font-size: 1.03em; font-weight: 500; }
+  .hero { position: relative; isolation: isolate; display: grid; align-items: end; min-height: clamp(575px, 76vh, 820px); background: #352219; }
+  .hero img, .hero::after { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .hero img { z-index: -2; object-fit: cover; object-position: 60% 39%; }
+  .hero::after { content: ""; z-index: -1; background: linear-gradient(90deg,#13110ffb 0%,#13110fe0 25%,#13110f55 57%,#13110f00 84%),linear-gradient(0deg,#13110f 0%,#13110f00 40%); }
+  .hero-copy { padding-block: 100px 74px; }
+  .hero-copy .eyebrow { margin: 0 0 21px; }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 400; }
+  h1 { max-width: 780px; margin: 0; font-size: clamp(3.15rem, 6.15vw, 6rem); line-height: .98; letter-spacing: -.061em; }
+  h1 span, h1 em { display: block; }
+  h1 em { color: var(--gold); font-weight: 400; }
+  .hero p:not(.eyebrow) { max-width: 395px; margin: 25px 0 27px; color: var(--muted); font-size: 1rem; }
+  .facts { border-block: 1px solid var(--line); }
+  .facts .wrap { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+  .fact { padding: 20px 20px 20px 0; }
+  .fact + .fact { border-left: 1px solid var(--line); padding-left: 22px; }
+  .fact strong, .fact span { display: block; }
+  .fact strong { font-size: .87rem; }
+  .fact span { color: var(--muted); font-size: .78rem; margin-top: 2px; }
+  .services { padding-block: 82px; }
+  .section-title { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 26px; }
+  h2 { margin: 0; font-size: clamp(2.45rem, 5.4vw, 4.2rem); letter-spacing: -.052em; line-height: 1; }
+  .section-title p { margin: 0 0 5px; color: var(--muted); font-size: .9rem; }
+  .service-list { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 17px; }
+  .service { position: relative; isolation: isolate; display: flex; align-items: end; min-height: 394px; border: 1px solid var(--line); border-radius: 15px; overflow: hidden; background: var(--panel); }
+  .service img, .service::before { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .service img { z-index: -2; object-fit: cover; object-position: 50% 45%; }
+  .service::before { content: ""; z-index: -1; background: linear-gradient(0deg,#13110f 0%,#13110fcd 22%,#13110f00 85%); }
+  .service-copy { width: 100%; padding: 23px 23px 25px; }
+  h3 { margin: 0 0 7px; font-size: clamp(1.6rem, 3.3vw, 2.45rem); letter-spacing: -.035em; line-height: 1.08; }
+  .service p { margin: 0 0 15px; color: var(--muted); font-size: .91rem; }
+  .contact-panel { display: flex; justify-content: space-between; align-items: center; gap: 32px; margin-bottom: 74px; padding: 35px 36px; background: var(--panel); border: 1px solid var(--line); border-radius: 15px; }
+  .contact-panel p { margin: 9px 0 0; color: var(--muted); }
+  footer { border-top: 1px solid var(--line); }
+  footer .wrap { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; column-gap: 20px; padding-block: 23px; }
+  footer p { margin: 0; color: var(--muted); font-size: .78rem; }
+  dialog { width: min(445px, 100% - 32px); padding: 30px; background: var(--panel); color: var(--ink); border: 1px solid #705b47; border-radius: 16px; }
+  dialog::backdrop { background: #100d0cbc; backdrop-filter: blur(5px); }
+  .close { position: absolute; top: 10px; right: 10px; width: 41px; height: 41px; border: 0; border-radius: 50%; background: transparent; color: var(--ink); font-size: 1.45rem; cursor: pointer; }
+  .close:hover { background: #ffffff12; }
+  #booking-title { margin: 9px 26px 0 0; font-size: 2.3rem; }
+  .booking-address { color: var(--muted); margin: 12px 0 20px; }
+  .booking-map { display: block; margin-top: 15px; color: var(--muted); font-size: .82rem; }
+  @media (max-width: 950px) { .wrap { width: calc(100% - 52px); } }
+  @media (max-width: 660px) {
+    html { scroll-padding-top: 72px; }
+    .wrap { width: calc(100% - 36px); }
+    .header .wrap { grid-template-columns: 1fr auto; height: 60px; gap: 8px; }
+    .wordmark { font-size: 1.36rem; }
+    nav { display: none; }
+    .hero { min-height: min(705px, max(575px, 82svh)); }
+    .hero img { object-position: 68% 32%; }
+    .hero::after { background: linear-gradient(0deg,#13110f 0%,#13110ff5 14%,#13110fac 38%,#13110f00 69%); }
+    .hero-copy { padding: 260px 0 35px; }
+    .hero-copy .eyebrow { margin-bottom: 12px; }
+    h1 { font-size: clamp(2.35rem, 10vw, 4rem); letter-spacing: -.057em; }
+    .hero p:not(.eyebrow) { margin: 16px 0 18px; font-size: .9rem; max-width: 320px; }
+    .hero .button { min-height: 47px; padding-inline: 14px; font-size: .8rem; }
+    .facts .wrap { grid-template-columns: 1fr 1fr; }
+    .fact { padding: 13px 8px 13px 0; }
+    .fact + .fact { padding-left: 12px; }
+    .fact:last-child { grid-column: 1/-1; border-top: 1px solid var(--line); border-left: none; padding-left: 0; }
+    .services { padding-block: 53px; }
+    .section-title { align-items: start; flex-direction: column; gap: 7px; }
+    .service-list { grid-template-columns: minmax(0,1fr); gap: 12px; }
+    .service { min-height: 304px; }
+    .service-copy { padding: 16px; }
+    .contact-panel { align-items: start; flex-direction: column; gap: 19px; padding: 18px; margin-bottom: 48px; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="wrap">
+    <a class="wordmark" href="#top" aria-label="Garten, в начало страницы">GARTEN</a>
+    <nav aria-label="Разделы сайта">
+      <a href="#services">Услуги</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+    <a class="button button-outline button-small" href="https://n2348046.yclients.com/company/2035017" data-book="Онлайн-запись" target="_blank" rel="noopener">Записаться <span class="arrow" aria-hidden="true">↗</span></a>
+  </div>
+</header>
+<main id="top">
+  <section class="hero" aria-labelledby="hero-title">
+    <img src="hair.webp" alt="" fetchpriority="high" width="1440" height="1080">
+    <div class="wrap hero-copy">
+      <p class="eyebrow">Концепт сайта · Калининград</p>
+      <h1 id="hero-title"><span>Цвет, который</span><em>вам идёт.</em></h1>
+      <p>Сложное окрашивание и SPA-уход для кожи головы в салоне Garten.</p>
+      <div class="actions">
+        <a class="button" href="https://n2348046.yclients.com/company/2035017" data-book="Онлайн-запись" target="_blank" rel="noopener">Записаться онлайн <span class="arrow" aria-hidden="true">↗</span></a>
+        <a class="button button-outline" href="#services">Смотреть услуги</a>
+      </div>
+    </div>
+  </section>
+  <div class="facts">
+    <div class="wrap">
+      <div class="fact"><strong>Окрашивание</strong><span>Многотональный цвет и мягкие переходы</span></div>
+      <div class="fact"><strong>SPA для кожи головы</strong><span>Уход за кожей головы и волосами</span></div>
+      <div class="fact"><strong>ул. Ермака, 8</strong><span>Центральный район, Калининград</span></div>
+    </div>
+  </div>
+  <section class="wrap services" id="services" aria-labelledby="services-title">
+    <div class="section-title"><h2 id="services-title">Услуги салона</h2><p>Выберите, с чего хотите начать.</p></div>
+    <div class="service-list">
+      <article class="service">
+        <img src="color.webp" alt="" loading="lazy" width="850" height="614">
+        <div class="service-copy">
+          <h3>Сложное окрашивание</h3>
+          <p>Подбор оттенка, глубина тона и мягкие переходы.</p>
+          <a class="button button-outline button-small" href="https://n2348046.yclients.com/company/2035017" data-book="Сложное окрашивание" target="_blank" rel="noopener">Записаться <span class="arrow" aria-hidden="true">↗</span></a>
+        </div>
+      </article>
+      <article class="service">
+        <img src="spa.webp" alt="" loading="lazy" width="900" height="675">
+        <div class="service-copy">
+          <h3>SPA для кожи головы</h3>
+          <p>Массаж и уход за кожей головы и волосами.</p>
+          <a class="button button-outline button-small" href="https://n2348046.yclients.com/company/2035017" data-book="SPA для кожи головы" target="_blank" rel="noopener">Записаться <span class="arrow" aria-hidden="true">↗</span></a>
+        </div>
+      </article>
+    </div>
+  </section>
+  <section class="wrap contact-panel" id="contacts" aria-labelledby="contact-title">
+    <div><h2 id="contact-title">Как нас найти</h2><p>Калининград, ул. Ермака, 8</p></div>
+    <a class="button button-outline" target="_blank" rel="noopener" href="https://2gis.ru/kaliningrad/firm/70000001114801556">Салон на карте <span class="arrow" aria-hidden="true">↗</span></a>
+  </section>
+</main>
+<footer>
+  <div class="wrap">
+    <a class="wordmark" href="#top" aria-label="Garten, в начало страницы">GARTEN</a>
+    <p>Концепт сайта от «Кёниг Код». Фотографии для макета иллюстративные.</p>
+  </div>
+</footer>
+<dialog id="booking" aria-labelledby="booking-title">
+  <form method="dialog"><button class="close" value="close" aria-label="Закрыть окно записи">×</button></form>
+  <p class="eyebrow">Garten · Запись через YCLIENTS</p>
+  <h2 id="booking-title">Онлайн-запись</h2>
+  <p class="booking-address">Выберите услугу и удобное время в онлайн-расписании салона.</p>
+  <a class="button" href="https://n2348046.yclients.com/company/2035017" target="_blank" rel="noopener">Открыть YCLIENTS <span class="arrow" aria-hidden="true">↗</span></a>
+  <a class="booking-map text-link" target="_blank" rel="noopener" href="https://2gis.ru/kaliningrad/firm/70000001114801556">Карточка салона в 2ГИС</a>
+</dialog>
+<script>
+  const booking = document.getElementById('booking');
+  const bookingTitle = document.getElementById('booking-title');
+
+  for (const link of document.querySelectorAll('[data-book]')) {
+    link.addEventListener('click', (event) => {
+      if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey || !booking.showModal) return;
+      event.preventDefault();
+      bookingTitle.textContent = link.dataset.book;
+      booking.showModal();
+    });
+  }
+</script>
+</body>
+</html>
